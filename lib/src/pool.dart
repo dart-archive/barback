@@ -9,6 +9,7 @@ import 'dart:collection';
 
 import 'package:stack_trace/stack_trace.dart';
 
+// TODO(nweiz): put this somewhere that it can be shared between packages.
 /// Manages an abstract pool of resources with a limit on how many may be in use
 /// at once.
 ///
