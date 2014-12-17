@@ -10,7 +10,7 @@ name: barback
 version: 0.15.2+2
 
 author: "Dart Team <misc@dartlang.org>"
-homepage: http://www.dartlang.org
+homepage: http://github.com/dart-lang/barback
 description: >
   An asset build system.
 
