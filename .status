@@ -2,11 +2,18 @@
 # for details. All rights reserved. Use of this source code is governed by a
 # BSD-style license that can be found in the LICENSE file.
 
+# Skip non-test files ending with "_test".
+*/packages/*: Skip
+
+# Only run tests from the build directory, since we don't care about the
+# difference between transformed an untransformed code.
+test/*: Skip
+
 [ $runtime == vm && $mode == debug]
-barback/test/package_graph/repetition_test: Skip  # Times out
+*/package_graph/repetition_test: Skip  # Times out
 
 [ $runtime == vm && ( $arch == simarm || $arch == simmips ) ]
-barback/test/too_many_open_files_test: Skip # 14220
+*/too_many_open_files_test: Skip # 14220
 
 [ $browser ]
-barback/test/*: Fail, OK # Uses dart:io.
+*: Fail, OK # Uses dart:io.
