@@ -15,10 +15,10 @@ packages/*: Skip
 test/*: Skip
 
 [ $runtime == vm && $mode == debug]
-*/package_graph/repetition_test: Skip  # Times out
+build/test/package_graph/repetition_test: Skip  # Times out
 
 [ $runtime == vm && ( $arch == simarm || $arch == simmips ) ]
-*/too_many_open_files_test: Skip # 14220
+build/test/too_many_open_files_test: Skip # 14220
 
 [ $browser ]
 *: Fail, OK # Uses dart:io.
