@@ -1,3 +1,7 @@
+## 0.15.2+3
+
+* Clarify that a transform may emit any number of outputs.
+
 ## 0.15.2+2
 
 * Fix a bug in listing all assets from a static package.

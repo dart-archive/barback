@@ -103,7 +103,7 @@ class AggregateTransform extends BaseTransform {
     });
   }
 
-  /// Stores [output] as the output created by this transformation.
+  /// Stores [output] as an output created by this transformation.
   ///
   /// A transformation can output as many assets as it wants.
   void addOutput(Asset output) {
