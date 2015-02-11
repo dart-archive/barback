@@ -1,3 +1,7 @@
+## 0.15.2+4
+
+* Fix an incorrect example.
+
 ## 0.15.2+3
 
 * Clarify that a transform may emit any number of outputs.
