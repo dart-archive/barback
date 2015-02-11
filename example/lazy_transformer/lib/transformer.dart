@@ -18,7 +18,7 @@ class CodedMessageConverter extends Transformer
   }
 
   Future declareOutputs(DeclaringTransform transform) {
-    return new Future.value(transform.primaryId.changeExtension('.shhhhh'));
+    transform.declareOutput(transform.primaryId.changeExtension('.shhhhh'));
   }
 
   Future apply(Transform transform) {
