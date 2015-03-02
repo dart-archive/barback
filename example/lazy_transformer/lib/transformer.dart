@@ -6,38 +6,36 @@ import 'package:barback/barback.dart';
 
 import 'dart:async';
 
-class CodedMessageConverter extends Transformer 
-                            implements LazyTransformer {
+class CodedMessageConverter extends Transformer implements LazyTransformer {
 
   // A constructor named "asPlugin" is required. It can be empty, but
   // it must be present.
   CodedMessageConverter.asPlugin();
 
-  Future<bool> isPrimary(AssetId id) {
-    return new Future.value(id.extension == '.txt');
+  Future<bool> isPrimary(AssetId id) async {
+    return id.extension == '.txt';
   }
 
   Future declareOutputs(DeclaringTransform transform) {
     transform.declareOutput(transform.primaryId.changeExtension('.shhhhh'));
   }
 
-  Future apply(Transform transform) {
-    return transform.primaryInput.readAsString().then((content) {
+  Future apply(Transform transform) async {
+    var content = await transform.primaryInput.readAsString();
 
-      // The output file is created with the '.shhhhh' extension.
-      var id = transform.primaryInput.id.changeExtension('.shhhhh');
+    // The output file is created with the '.shhhhh' extension.
+    var id = transform.primaryInput.id.changeExtension('.shhhhh');
 
-      StringBuffer newContent = new StringBuffer();
-      for (int i = 0; i < content.length; i++ ) {
-        newContent.write(rot13(content[i]));
-      }
-      transform.addOutput(new Asset.fromString(id, newContent.toString()));
-    });
+    var newContent = new StringBuffer();
+    for (int i = 0; i < content.length; i++) {
+      newContent.write(rot13(content[i]));
+    }
+    transform.addOutput(new Asset.fromString(id, newContent.toString()));
   }
 
   rot13(var ch) {
     var c = ch.codeUnitAt(0);
-    if      (c >= 'a'.codeUnitAt(0) && c <= 'm'.codeUnitAt(0)) c += 13;
+    if (c >= 'a'.codeUnitAt(0) && c <= 'm'.codeUnitAt(0)) c += 13;
     else if (c >= 'A'.codeUnitAt(0) && c <= 'M'.codeUnitAt(0)) c += 13;
     else if (c >= 'n'.codeUnitAt(0) && c <= 'z'.codeUnitAt(0)) c -= 13;
     else if (c >= 'N'.codeUnitAt(0) && c <= 'Z'.codeUnitAt(0)) c -= 13;

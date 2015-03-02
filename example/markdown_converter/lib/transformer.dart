@@ -18,16 +18,14 @@ class ConvertMarkdown extends Transformer {
   // converted to HTML.
   String get allowedExtensions => ".md .markdown .mdown";
 
-  Future apply(Transform transform) {
-    return transform.primaryInput.readAsString().then((content) {
+  Future apply(Transform transform) async {
+    var content = await transform.primaryInput.readAsString();
 
-      // The extension of the output is changed to ".html".
-      var id = transform.primaryInput.id.changeExtension(".html");
+    // The extension of the output is changed to ".html".
+    var id = transform.primaryInput.id.changeExtension(".html");
 
-      String newContent = "<html><body>"
-                        + markdownToHtml(content)
-                        + "</body></html>";
-      transform.addOutput(new Asset.fromString(id, newContent));
-    });
+    var newContent =
+        "<html><body>" + markdownToHtml(content) + "</body></html>";
+    transform.addOutput(new Asset.fromString(id, newContent));
   }
 }
