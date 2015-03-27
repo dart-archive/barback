@@ -12,9 +12,7 @@ class CodedMessageConverter extends Transformer implements LazyTransformer {
   // it must be present.
   CodedMessageConverter.asPlugin();
 
-  Future<bool> isPrimary(AssetId id) async {
-    return id.extension == '.txt';
-  }
+  Future<bool> isPrimary(AssetId id) async => id.extension == '.txt';
 
   Future declareOutputs(DeclaringTransform transform) {
     transform.declareOutput(transform.primaryId.changeExtension('.shhhhh'));
@@ -27,7 +25,7 @@ class CodedMessageConverter extends Transformer implements LazyTransformer {
     var id = transform.primaryInput.id.changeExtension('.shhhhh');
 
     var newContent = new StringBuffer();
-    for (int i = 0; i < content.length; i++) {
+    for (var i = 0; i < content.length; i++) {
       newContent.write(rot13(content[i]));
     }
     transform.addOutput(new Asset.fromString(id, newContent.toString()));
