@@ -1,3 +1,8 @@
+## 0.15.2+5
+
+* If a transformer requests a non-existent asset from another package, it will
+  now be re-run if that asset is later created.
+
 ## 0.15.2+4
 
 * Fix an incorrect example.

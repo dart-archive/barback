@@ -80,6 +80,7 @@ class AssetCascade {
   final _streams = new NodeStreams();
   Stream<LogEntry> get onLog => _streams.onLog;
   Stream<NodeStatus> get onStatusChange => _streams.onStatusChange;
+  Stream<AssetNode> get onAsset => _streams.onAsset;
 
   /// Returns all currently-available output assets from this cascade.
   Future<AssetSet> get availableOutputs => new Future.value(new AssetSet.from(
@@ -90,6 +91,7 @@ class AssetCascade {
   /// It loads source assets within [package] using [provider].
   AssetCascade(this.graph, this.package) {
     _addPhase(new Phase(this, package));
+    _streams.onAssetPool.add(_phases.last.onAsset);
   }
 
   /// Gets the asset identified by [id].
@@ -171,6 +173,7 @@ class AssetCascade {
   /// Elements of the inner iterable of [transformers] must be [Transformer]s,
   /// [TransformerGroup]s, or [AggregateTransformer]s.
   void updateTransformers(Iterable<Iterable> transformersIterable) {
+    _streams.onAssetPool.remove(_phases.last.onAsset);
     var transformers = transformersIterable.toList();
 
     // Always preserve a single phase with no transformers at the beginning of
@@ -195,6 +198,8 @@ class AssetCascade {
     _phaseStatusSubscription.cancel();
     _phaseStatusSubscription = _phases.last.onStatusChange
         .listen(_streams.changeStatus);
+
+    _streams.onAssetPool.add(_phases.last.onAsset);
   }
 
   /// Force all [LazyTransformer]s' transforms in this cascade to begin

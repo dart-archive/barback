@@ -390,5 +390,46 @@ main() {
       expectAsset('app|foo.txt', 'app|bar.txt: true');
       buildShouldSucceed();
     });
+
+    group("on an input in another package", () {
+      test("returns whether it exists", () {
+        initGraph(["app|foo.txt", "other|bar.txt"], {'app': [
+          [new HasInputTransformer(['other|bar.txt', 'other|baz.txt'])]
+        ]});
+
+        updateSources(['app|foo.txt', 'other|bar.txt']);
+        expectAsset('app|foo.txt',
+            'other|bar.txt: true, other|baz.txt: false');
+        buildShouldSucceed();
+      });
+
+      test("re-runs the transformer when it stops existing", () {
+        initGraph(["app|foo.txt", "other|bar.txt"], {'app': [
+          [new HasInputTransformer(['other|bar.txt'])]
+        ]});
+
+        updateSources(['app|foo.txt', 'other|bar.txt']);
+        expectAsset('app|foo.txt', 'other|bar.txt: true');
+        buildShouldSucceed();
+
+        removeSources(['other|bar.txt']);
+        expectAsset('app|foo.txt', 'other|bar.txt: false');
+        buildShouldSucceed();
+      });
+
+      test("re-runs the transformer when it starts existing", () {
+        initGraph(["app|foo.txt", "other|bar.txt"], {'app': [
+          [new HasInputTransformer(['other|bar.txt'])]
+        ]});
+      
+        updateSources(['app|foo.txt']);
+        expectAsset('app|foo.txt', 'other|bar.txt: false');
+        buildShouldSucceed();
+      
+        updateSources(['other|bar.txt']);
+        expectAsset('app|foo.txt', 'other|bar.txt: true');
+        buildShouldSucceed();
+      });
+    });
   });
 }

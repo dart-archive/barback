@@ -97,6 +97,11 @@ class TransformNode {
   /// stream.
   final _secondarySubscriptions = new Map<AssetId, StreamSubscription>();
 
+  /// The subscriptions to the [AssetCascade.onAsset] stream for cascades that
+  /// might generate assets in [_missingInputs].
+  final _missingExternalInputSubscriptions =
+      new Map<String, StreamSubscription>();
+
   /// The controllers for the asset nodes emitted by this node.
   final _outputControllers = new Map<AssetId, AssetNodeController>();
 
@@ -568,6 +573,23 @@ class TransformNode {
       // results stream.
       if (node == null) {
         _missingInputs.add(id);
+
+        // If this id is for an asset in another package, subscribe to that
+        // package's asset cascade so when it starts emitting the id we know to
+        // re-run the transformer.
+        if (id.package != phase.cascade.package) {
+          var stream = phase.cascade.graph.onAssetFor(id.package);
+          if (stream != null) {
+            _missingExternalInputSubscriptions.putIfAbsent(id.package, () {
+              return stream.listen((node) {
+                if (!_missingInputs.contains(node.id)) return;
+                if (_forced) node.force();
+                _dirty();
+              });
+            });
+          }
+        }
+
         throw new AssetNotFoundException(id);
       }
 
@@ -706,13 +728,17 @@ class TransformNode {
     }
   }
 
-  /// Cancels all subscriptions to secondary input nodes.
+  /// Cancels all subscriptions to secondary input nodes and other cascades.
   void _clearSecondarySubscriptions() {
     _missingInputs.clear();
     for (var subscription in _secondarySubscriptions.values) {
       subscription.cancel();
     }
+    for (var subscription in _missingExternalInputSubscriptions.values) {
+      subscription.cancel();
+    }
     _secondarySubscriptions.clear();
+    _missingExternalInputSubscriptions.clear();
   }
 
   /// Removes all output assets.

@@ -134,6 +134,15 @@ class PackageGraph {
     });
   }
 
+  /// Returns the stream of newly-emitted assets for the given package's
+  /// cascade.
+  ///
+  /// If there's no cascade for [package], returns `null`.
+  Stream<AssetNode> onAssetFor(String package) {
+    var cascade = _cascades[package];
+    return cascade == null ? null : cascade.onAsset;
+  }
+
   /// Gets all output assets.
   ///
   /// If a build is currently in progress, waits until it completes. The
