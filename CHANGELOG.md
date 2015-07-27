@@ -1,3 +1,8 @@
+## 0.15.2+6
+
+* Fix a deadlock that occurred occasionally when a declaring transformer was
+  followed by a lazy transformer (most commonly `$dart2js`).
+
 ## 0.15.2+5
 
 * If a transformer requests a non-existent asset from another package, it will

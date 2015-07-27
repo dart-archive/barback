@@ -334,6 +334,13 @@ class TransformNode {
       // transformation.
       _restartRun();
     } else if (input.state.isAvailable) {
+      if (_state == _State.DECLARED) {
+        // If we're passing through this input and its contents don't matter,
+        // update the pass-through controller.
+        var controller = _passThroughControllers[input.id];
+        if (controller != null) controller.setAvailable(input.asset);
+      }
+
       if (_state == _State.DECLARED && _canRunDeclaringEagerly) {
         // If [this] is fully declared but hasn't started applying, this input
         // becoming available may mean that all inputs are available, in which
@@ -358,6 +365,10 @@ class TransformNode {
       }
     } else {
       if (_forced) input.force();
+
+      var controller = _passThroughControllers[input.id];
+      if (controller != null) controller.setDirty();
+
       if (_state == _State.APPLYING && !_applyController.addedId(input.id) &&
           (_forced || !input.isLazy)) {
         // If the input hasn't yet been added to the transform's input stream,

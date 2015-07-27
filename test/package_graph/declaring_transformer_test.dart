@@ -165,6 +165,35 @@ main() {
     buildShouldSucceed();
   });
 
+  // Regression test for #64.
+  test("a declaring transformer's output passes through a lazy transformer",
+      () {
+    var declaring = new DeclaringRewriteTransformer("one", "two");
+    initGraph(["app|foo.one"], {"app": [
+      [declaring],
+      [new LazyRewriteTransformer("two", "three")]
+    ]});
+
+    updateSources(["app|foo.one"]);
+    // Give the transformers time to declare their assets.
+    schedule(pumpEventQueue);
+
+    expectAsset("app|foo.one", "foo");
+    expectAsset("app|foo.two", "foo.two");
+    expectAsset("app|foo.three", "foo.two.three");
+    buildShouldSucceed();
+
+    modifyAsset("app|foo.one", "bar");
+    updateSources(["app|foo.one"]);
+
+    expectAsset("app|foo.one", "bar");
+    expectAsset("app|foo.two", "bar.two");
+    expectAsset("app|foo.three", "bar.two.three");
+    buildShouldSucceed();
+
+    expect(declaring.numRuns, completion(equals(2)));
+  });
+
   test("a declaring transformer following a lazy transformer runs eagerly once "
       "its input is available", () {
     var declaring = new DeclaringRewriteTransformer("two", "three");
