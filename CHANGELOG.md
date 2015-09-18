@@ -1,3 +1,7 @@
+## 0.15.2+7
+
+* Add periodic fine-grained logging for long running transformers.
+
 ## 0.15.2+6
 
 * Fix a deadlock that occurred occasionally when a declaring transformer was

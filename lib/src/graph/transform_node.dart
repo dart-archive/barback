@@ -23,6 +23,10 @@ import 'node_streams.dart';
 import 'phase.dart';
 import 'transformer_classifier.dart';
 
+/// Every `_applyLogDuration`, we will issue a fine log entry letting the user
+/// know that the transform is still executing.
+const _applyLogDuration = const Duration(seconds: 10);
+
 /// Describes a transform on a set of assets and its relationship to the build
 /// dependency graph.
 ///
@@ -171,9 +175,11 @@ class TransformNode {
   /// [_State.NEEDS_DECLARE], and always `null` otherwise.
   AggregateTransformController _applyController;
 
-  /// The number of secondary inputs that have been requested but not yet
-  /// produced.
-  int _pendingSecondaryInputs = 0;
+  /// Map to track pending requests for secondary inputs.
+  ///
+  /// Keys are the secondary inputs that have been requested but not yet
+  /// produced. Values are the number of requests for that input.
+  final _pendingSecondaryInputs = <AssetId, int>{};
 
   /// A stopwatch that tracks the total time spent in a transformer's `apply`
   /// function.
@@ -577,7 +583,9 @@ class TransformNode {
   /// If an input with [id] cannot be found, throws an [AssetNotFoundException].
   Future<Asset> getInput(AssetId id) {
     _timeAwaitingInputs.start();
-    _pendingSecondaryInputs++;
+    _pendingSecondaryInputs[id] = _pendingSecondaryInputs.containsKey(id)
+        ? _pendingSecondaryInputs[id] + 1
+        : 1;
     return phase.previous.getOutput(id).then((node) {
       // Throw if the input isn't found. This ensures the transformer's apply
       // is exited. We'll then catch this and report it through the proper
@@ -610,8 +618,13 @@ class TransformNode {
 
       return node.asset;
     }).whenComplete(() {
-      _pendingSecondaryInputs--;
-      if (_pendingSecondaryInputs != 0) _timeAwaitingInputs.stop();
+      assert(_pendingSecondaryInputs.containsKey(id));
+      if (_pendingSecondaryInputs[id] == 1) {
+        _pendingSecondaryInputs.remove(id);
+      } else {
+        _pendingSecondaryInputs[id]--;
+      }
+      if (_pendingSecondaryInputs.isEmpty) _timeAwaitingInputs.stop();
     });
   }
 
@@ -628,12 +641,36 @@ class TransformNode {
     }
     _maybeFinishApplyController();
 
+    var transformCounterTimer;
+
     return syncFuture(() {
       _timeInTransformer.reset();
       _timeAwaitingInputs.reset();
       _timeInTransformer.start();
+
+      transformCounterTimer = new Timer.periodic(_applyLogDuration, (_) {
+        if (_streams.onLogController.isClosed ||
+            !_timeInTransformer.isRunning) {
+          return;
+        }
+
+        var message = new StringBuffer("Not yet complete after "
+            "${niceDuration(_timeInTransformer.elapsed)}");
+        if (_pendingSecondaryInputs.isNotEmpty) {
+          message.write(", waiting on input(s) "
+              "${_pendingSecondaryInputs.keys.join(", ")}");
+        }
+        _streams.onLogController.add(new LogEntry(
+              info,
+              info.primaryId,
+              LogLevel.FINE,
+              message.toString(),
+              null));
+      });
+
       return transformer.apply(controller.transform);
     }).whenComplete(() {
+      transformCounterTimer.cancel();
       _timeInTransformer.stop();
       _timeAwaitingInputs.stop();
 
