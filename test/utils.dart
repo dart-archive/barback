@@ -215,6 +215,17 @@ void buildShouldSucceed() {
   }), completes);
 }
 
+/// Expects that the next [BuildResult] is a build success and that a certain
+/// asset was output.
+void buildShouldSucceedWithAsset(String name) {
+  var id = new AssetId.parse(name);
+  expect(_getNextBuildResult("build should succeed").then((result) {
+    result.errors.forEach(currentSchedule.signalError);
+    expect(result.succeeded, isTrue);
+    expect(result.outputs.any((AssetId assetId) => assetId == id), isTrue);
+  }), completes);
+}
+
 /// Expects that the next [BuildResult] emitted is a failure.
 ///
 /// [matchers] is a list of matchers to match against the errors that caused the
