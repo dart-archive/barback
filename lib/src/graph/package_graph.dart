@@ -74,6 +74,12 @@ class PackageGraph {
   /// This will be empty if no build is occurring.
   final _accumulatedErrors = new Queue<BarbackException>();
 
+  /// The [Asset]s that have been output since the current build started.
+  ///
+  /// This will be empty if no build is occurring.
+  Set<AssetId> _accumulatedOutputs = new Set<AssetId>();
+  Stream<BarbackException> _outputs;
+
   /// The most recent error emitted from a cascade's result stream.
   ///
   /// This is used to pipe an unexpected error from a build to the resulting
@@ -112,6 +118,12 @@ class PackageGraph {
       _errors = mergeStreams(_cascades.values.map((cascade) => cascade.errors),
           broadcast: true);
       _errors.listen(_accumulatedErrors.add);
+
+      _outputs = mergeStreams(
+          _cascades.values.map((cascade) => cascade.onAsset));
+      _outputs.listen((output) {
+        _accumulatedOutputs.add(output.id);
+      });
 
       // Make sure a result gets scheduled even if there are no cascades or all
       // of them are static.
@@ -261,8 +273,9 @@ class PackageGraph {
       _resultScheduled = false;
       if (_status != NodeStatus.IDLE) return;
 
-      _lastResult = new BuildResult(_accumulatedErrors);
+      _lastResult = new BuildResult(_accumulatedErrors, _accumulatedOutputs);
       _accumulatedErrors.clear();
+      _accumulatedOutputs = new Set<AssetId>();
       _resultsController.add(_lastResult);
     });
   }

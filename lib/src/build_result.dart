@@ -4,6 +4,7 @@
 
 library barback.build_result;
 
+import 'asset/asset_id.dart';
 import 'errors.dart';
 import 'utils.dart';
 
@@ -23,20 +24,23 @@ class BuildResult {
   /// `true` if the build succeeded.
   bool get succeeded => errors.isEmpty;
 
-  BuildResult(Iterable<BarbackException> errors)
+  final Set<AssetId> outputs;
+
+  BuildResult(Iterable<BarbackException> errors, [this.outputs])
       : errors = flattenAggregateExceptions(errors).toSet();
 
   /// Creates a build result indicating a successful build.
   ///
   /// This equivalent to a build result with no errors.
-  BuildResult.success()
-      : this([]);
+  BuildResult.success([Set<AssetId> outputs]) : this([], outputs);
 
   /// Creates a single [BuildResult] that contains all of the errors of
   /// [results].
   factory BuildResult.aggregate(Iterable<BuildResult> results) {
     var errors = unionAll(results.map((result) => result.errors));
-    return new BuildResult(errors);
+    var outputs = unionAll(results.map((result) =>
+        result.outputs != null ? result.outputs : new Set<AssetId>()));
+    return new BuildResult(errors, outputs);
   }
 
   String toString() {

@@ -20,7 +20,7 @@ main() {
 
     updateTransformers("app", [[new RewriteTransformer("blub", "blab")]]);
     expectAsset("app|foo.blab", "foo.blab");
-    buildShouldSucceed();
+    buildShouldSucceedWithAsset("app|foo.blab");
   });
 
   test("a new transformer is not applied to a non-matching asset", () {
