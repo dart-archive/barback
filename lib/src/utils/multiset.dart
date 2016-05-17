@@ -23,9 +23,10 @@ class Multiset<E> extends IterableBase<E> {
   final _map = new Map<E, int>();
 
   Iterator<E> get iterator {
-    return _map.keys.expand((element) {
-      return new Iterable.generate(_map[element], (_) => element);
-    }).iterator;
+    return _map.keys
+        .expand((element) =>
+            new Iterable<E>.generate(_map[element], (_) => element))
+        .iterator;
   }
 
   Multiset()
@@ -56,7 +57,7 @@ class Multiset<E> extends IterableBase<E> {
   }
 
   /// Returns whether [value] is in the set.
-  bool contains(E value) => _map.containsKey(value);
+  bool contains(Object value) => _map.containsKey(value);
 
   /// Returns the number of copies of [value] in the set.
   int count(E value) => _map.containsKey(value) ? _map[value] : 0;

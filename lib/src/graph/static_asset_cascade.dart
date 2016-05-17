@@ -6,6 +6,9 @@ library barback.graph.static_asset_cascade;
 
 import 'dart:async';
 
+import 'package:async/async.dart';
+import 'package:collection/collection.dart';
+
 import '../asset/asset_id.dart';
 import '../asset/asset_node.dart';
 import '../asset/asset_set.dart';
@@ -38,18 +41,18 @@ class StaticAssetCascade implements AssetCascade {
   final status = NodeStatus.IDLE;
 
   final onLog = new StreamController<LogEntry>.broadcast().stream;
-  final onStatusChange = new StreamController<LogEntry>.broadcast().stream;
+  final onStatusChange = new StreamController<NodeStatus>.broadcast().stream;
   final onAsset = new StreamController<AssetNode>.broadcast().stream;
 
   Future<AssetSet> get availableOutputs {
     var provider = graph.provider as StaticPackageProvider;
     return provider.getAllAssetIds(package).asyncMap(provider.getAsset).toList()
-        .then((assets) => new AssetSet.from(assets));
+        .then((assets) => new AssetSet.from(DelegatingList.typed(assets)));
   }
 
   Future<AssetNode> getAssetNode(AssetId id) {
     return _sources.putIfAbsent(id, () {
-      return graph.provider.getAsset(id).then((asset) {
+      return DelegatingFuture.typed(graph.provider.getAsset(id).then((asset) {
         return new AssetNodeController.available(asset).node;
       }).catchError((error, stackTrace) {
         if (error is! AssetNotFoundException) {
@@ -58,7 +61,7 @@ class StaticAssetCascade implements AssetCascade {
 
         // TODO(nweiz): propagate error information through asset nodes.
         return null;
-      });
+      }));
     });
   }
 

@@ -12,7 +12,6 @@ import '../errors.dart';
 import '../log.dart';
 import '../transformer/aggregate_transformer.dart';
 import '../transformer/wrapping_aggregate_transformer.dart';
-import '../utils.dart';
 import 'node_status.dart';
 import 'node_streams.dart';
 import 'phase.dart';
@@ -74,8 +73,8 @@ class TransformerClassifier {
   /// Adds a new asset as an input for this transformer.
   void addInput(AssetNode input) {
     _activeClassifications++;
-    syncFuture(() => transformer.classifyPrimary(input.id)).catchError(
-        (error, stackTrace) {
+    new Future.sync(() => transformer.classifyPrimary(input.id))
+        .catchError((error, stackTrace) {
       if (input.state.isRemoved) return null;
 
       // Catch all transformer errors and pipe them to the results stream. This

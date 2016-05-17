@@ -8,6 +8,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:async/async.dart';
+import 'package:collection/collection.dart';
+
 import '../serialize.dart';
 import '../utils.dart';
 import '../utils/file_pool.dart';
@@ -52,11 +55,14 @@ Map serializeAsset(Asset asset) {
 Asset deserializeAsset(Map asset) {
   var id = deserializeId(asset['id']);
   switch (asset['type']) {
-    case 'binary': return new BinaryAsset(id, asset['contents']);
+    case 'binary':
+      return new BinaryAsset(
+          id, DelegatingList.typed(asset['contents'] as List));
     case 'file': return new FileAsset(id, asset['path']);
     case 'string': return new StringAsset(id, asset['contents']);
     case 'stream':
-      return new StreamAsset(id, deserializeStream(asset['stream']));
+      return new StreamAsset(
+          id, DelegatingStream.typed(deserializeStream(asset['stream'])));
     default:
       throw new FormatException('Unknown asset type "${asset['type']}".');
   }
@@ -177,8 +183,8 @@ class StreamAsset implements Asset {
 
   Future<String> readAsString({Encoding encoding}) {
     if (encoding == null) encoding = UTF8;
-    return _replayer.getReplay().toList()
-        .then((chunks) => encoding.decode(flatten(chunks)));
+    return _replayer.getReplay().expand((chunk) => chunk).toList()
+        .then((bytes) => encoding.decode(bytes));
   }
 
   Stream<List<int>> read() => _replayer.getReplay();

@@ -24,8 +24,8 @@ class AssetNotFoundException implements Exception {
 Iterable<BarbackException> flattenAggregateExceptions(
     Iterable<BarbackException> errors) {
   return errors.expand((error) {
-    if (error is! AggregateException) return [error];
-    return error.errors;
+    if (error is AggregateException) return error.errors;
+    return [error];
   });
 }
 

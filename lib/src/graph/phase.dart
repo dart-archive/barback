@@ -6,6 +6,8 @@ library barback.graph.phase;
 
 import 'dart:async';
 
+import 'package:collection/collection.dart';
+
 import '../asset/asset_id.dart';
 import '../asset/asset_node.dart';
 import '../asset/asset_node_set.dart';
@@ -14,7 +16,6 @@ import '../log.dart';
 import '../transformer/aggregate_transformer.dart';
 import '../transformer/transformer.dart';
 import '../transformer/transformer_group.dart';
-import '../utils.dart';
 import '../utils/multiset.dart';
 import 'asset_cascade.dart';
 import 'group_runner.dart';
@@ -205,7 +206,7 @@ class Phase {
   /// 
   /// If the output cannot be found, returns null.
   Future<AssetNode> getOutput(AssetId id) {
-    return syncFuture(() {
+    return new Future.sync(() {
       if (id.package != cascade.package) return cascade.graph.getAssetNode(id);
       if (_outputs.containsKey(id)) {
         var output = _outputs[id].output;
@@ -258,8 +259,8 @@ class Phase {
       }
     }
 
-    var newGroups = transformers.where((op) => op is TransformerGroup)
-        .toSet();
+    var newGroups = DelegatingSet.typed/*<TransformerGroup>*/(
+        transformers.where((op) => op is TransformerGroup).toSet());
     var oldGroups = _groups.keys.toSet();
     for (var removed in oldGroups.difference(newGroups)) {
       _groups.remove(removed).remove();
@@ -389,7 +390,9 @@ class Phase {
     asset.whenStateChanges().then((state) {
       if (state.isRemoved) return getOutput(asset.id);
       return asset;
-    }).then(request.complete).catchError(request.completeError);
+    })
+       .then((asset) => request.complete(asset))
+       .catchError(request.completeError);
   }
 
   String toString() => "phase $_location.$_index";

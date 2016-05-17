@@ -1,3 +1,7 @@
+## 0.15.2+8
+
+* Fix all strong-mode warnings in Dart 1.16.
+
 ## 0.15.2+7
 
 * Add periodic fine-grained logging for long running transformers.

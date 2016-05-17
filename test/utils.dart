@@ -114,9 +114,9 @@ void initStaticGraph(assets, {Iterable<String> staticPackages,
 /// Each item in the list may either be an [AssetId] or a string that can be
 /// parsed as one.
 void updateSources(Iterable assets) {
-  assets = _parseAssets(assets);
-  schedule(() => _barback.updateSources(assets),
-      "updating ${assets.join(', ')}");
+  var parsed = _parseAssets(assets);
+  schedule(() => _barback.updateSources(parsed),
+      "updating ${parsed.join(', ')}");
 }
 
 /// Updates [assets] in the current [PackageProvider].
@@ -132,9 +132,9 @@ void updateSourcesSync(Iterable assets) =>
 /// Each item in the list may either be an [AssetId] or a string that can be
 /// parsed as one.
 void removeSources(Iterable assets) {
-  assets = _parseAssets(assets);
-  schedule(() => _barback.removeSources(assets),
-      "removing ${assets.join(', ')}");
+  var parsed = _parseAssets(assets);
+  schedule(() => _barback.removeSources(parsed),
+      "removing ${parsed.join(', ')}");
 }
 
 /// Removes [assets] from the current [PackageProvider].
@@ -155,7 +155,7 @@ void updateTransformers(String package, Iterable<Iterable> transformers) {
 List<AssetId> _parseAssets(Iterable assets) {
   return assets.map((asset) {
     if (asset is String) return new AssetId.parse(asset);
-    return asset;
+    return asset as AssetId;
   }).toList();
 }
 
@@ -210,7 +210,9 @@ void buildShouldNotBeDone() {
 /// Expects that the next [BuildResult] is a build success.
 void buildShouldSucceed() {
   expect(_getNextBuildResult("build should succeed").then((result) {
-    result.errors.forEach(currentSchedule.signalError);
+    for (var error in result.errors) {
+      currentSchedule.signalError(error);
+    }
     expect(result.succeeded, isTrue);
   }), completes);
 }
@@ -518,7 +520,7 @@ class MockProvider implements StaticPackageProvider {
 
   static Map<String, AssetSet> _normalizeAssets(assets,
       Iterable<String> additionalPackages) {
-    var assetList;
+    Iterable<Asset> assetList;
     if (assets is Map) {
       assetList = assets.keys.map((asset) {
         var id = new AssetId.parse(asset);
@@ -532,8 +534,9 @@ class MockProvider implements StaticPackageProvider {
       });
     }
 
-    var assetMap = mapMapValues(groupBy(assetList, (asset) => asset.id.package),
-        (package, assets) => new AssetSet.from(assets));
+    var assetMap = mapMapValues(
+        groupBy(assetList, (asset) => asset.id.package),
+        (_, assets) => new AssetSet.from(assets));
 
     // Make sure that packages that have transformers but no assets are
     // considered by MockProvider to exist.
@@ -563,7 +566,7 @@ class MockProvider implements StaticPackageProvider {
   Stream<AssetId> getAllAssetIds(String package) =>
       new Stream.fromIterable(_assets[package].map((asset) => asset.id));
 
-  Future<Asset> getAsset(AssetId id) {
+  Future<Asset> getAsset(AssetId id) async {
     // Eagerly load the asset so we can test an asset's value changing between
     // when a load starts and when it finishes.
     var assets = _assets[id.package];
@@ -573,18 +576,11 @@ class MockProvider implements StaticPackageProvider {
     if (_syncErrors.contains(id)) throw new MockLoadException(id);
     var hasError = _errors.contains(id);
 
-    var future;
-    if (_pauseCompleter != null) {
-      future = _pauseCompleter.future;
-    } else {
-      future = new Future.value();
-    }
+    if (_pauseCompleter != null) await _pauseCompleter.future;
 
-    return future.then((_) {
-      if (hasError) throw new MockLoadException(id);
-      if (asset == null) throw new AssetNotFoundException(id);
-      return asset;
-    });
+    if (hasError) throw new MockLoadException(id);
+    if (asset == null) throw new AssetNotFoundException(id);
+    return asset;
   }
 }
 

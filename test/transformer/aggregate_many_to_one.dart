@@ -32,15 +32,14 @@ class AggregateManyToOneTransformer extends MockAggregateTransformer {
     return path.url.dirname(id.path);
   }
 
-  Future doApply(AggregateTransform transform) {
-    return getPrimaryInputs(transform).toList().then((assets) {
-      assets.sort((asset1, asset2) => asset1.id.path.compareTo(asset2.id.path));
-      return Future.wait(assets.map((asset) => asset.readAsString()));
-    }).then((contents) {
-      var id = new AssetId(transform.package,
-          path.url.join(transform.key, output));
-      transform.addOutput(new Asset.fromString(id, contents.join('\n')));
-    });
+  Future doApply(AggregateTransform transform) async {
+    var assets = await getPrimaryInputs(transform).toList();
+    assets.sort((asset1, asset2) => asset1.id.path.compareTo(asset2.id.path));
+    var contents = await Future.wait(
+        assets.map((asset) => asset.readAsString()));
+    var id = new AssetId(transform.package,
+        path.url.join(transform.key, output));
+    transform.addOutput(new Asset.fromString(id, contents.join('\n')));
   }
 
   String toString() => "aggregate $extension->$output";

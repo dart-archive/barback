@@ -27,12 +27,12 @@ class CancelableFuture<T> implements Future<T> {
   }
 
   Stream<T> asStream() => _completer.future.asStream();
-  Future catchError(Function onError, {bool test(error)}) =>
+  Future catchError(Function onError, {bool test(Object error)}) =>
     _completer.future.catchError(onError, test: test);
-  Future then(onValue(T value), {Function onError}) =>
+  Future/*<S>*/ then/*<S>*/(/*=S*/ onValue(T value), {Function onError}) =>
     _completer.future.then(onValue, onError: onError);
   Future<T> whenComplete(action()) => _completer.future.whenComplete(action);
-  Future timeout(Duration timeLimit, {void onTimeout()}) =>
+  Future<T> timeout(Duration timeLimit, {void onTimeout()}) =>
     _completer.future.timeout(timeLimit, onTimeout: onTimeout);
   /// Cancels this future.
   void cancel() {

@@ -6,6 +6,8 @@ library barback.graph.asset_cascade;
 
 import 'dart:async';
 
+import 'package:async/async.dart';
+
 import '../asset/asset.dart';
 import '../asset/asset_id.dart';
 import '../asset/asset_node.dart';
@@ -13,7 +15,6 @@ import '../asset/asset_set.dart';
 import '../errors.dart';
 import '../log.dart';
 import '../transformer/transformer.dart';
-import '../utils.dart';
 import '../utils/cancelable_future.dart';
 import 'node_status.dart';
 import 'node_streams.dart';
@@ -113,13 +114,13 @@ class AssetCascade {
     // * If [id] has never been generated and all active transformers provide
     //   metadata about the file names of assets it can emit, we can prove that
     //   none of them can emit [id] and fail early.
-    return oldLastPhase.getOutput(id).then((node) {
+    return DelegatingFuture.typed(oldLastPhase.getOutput(id).then((node) {
       // The last phase may have changed if [updateSources] was called after
       // requesting the output. In that case, we want the output from the new
       // last phase.
       if (_phases.last == oldLastPhase) return node;
       return getAssetNode(id);
-    });
+    }));
   }
 
   /// Adds [sources] to the graph's known set of source assets.
@@ -142,11 +143,11 @@ class AssetCascade {
       if (_loadingSources.containsKey(id)) _loadingSources[id].cancel();
 
       _loadingSources[id] = new CancelableFuture<Asset>(
-          syncFuture(() => graph.provider.getAsset(id)));
+          new Future.sync(() => graph.provider.getAsset(id)));
       _loadingSources[id].whenComplete(() {
         _loadingSources.remove(id);
       }).then((asset) {
-        var controller = _sourceControllerMap[id].setAvailable(asset);
+        _sourceControllerMap[id].setAvailable(asset);
       }).catchError((error, stack) {
         reportError(new AssetLoadException(id, error, stack));
 

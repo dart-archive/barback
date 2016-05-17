@@ -8,7 +8,6 @@ import 'dart:async';
 
 import '../errors.dart';
 import '../graph/transform_node.dart';
-import '../utils.dart';
 import 'asset.dart';
 import 'asset_id.dart';
 
@@ -115,9 +114,9 @@ class AssetNode {
   /// [callback] is called synchronously if this is already in such a state.
   ///
   /// The return value of [callback] is piped to the returned Future.
-  Future _waitForState(bool test(AssetState state),
-      callback(AssetState state)) {
-    if (test(state)) return syncFuture(() => callback(state));
+  Future/*<T>*/ _waitForState/*<T>*/(bool test(AssetState state),
+      /*=T*/ callback(AssetState state)) {
+    if (test(state)) return new Future.sync(() => callback(state));
     return onStateChange.firstWhere(test).then((_) => callback(state));
   }
 

@@ -54,10 +54,7 @@ class AssetSet extends IterableBase<Asset> {
   }
 
   /// Returns `true` if the set contains [asset].
-  bool contains(Asset asset) {
-    var other = _assets[asset.id];
-    return other == asset;
-  }
+  bool contains(Object asset) => asset is Asset && _assets[asset.id] == asset;
 
   /// Returns `true` if the set contains an [Asset] with [id].
   bool containsId(AssetId id) {

@@ -7,7 +7,6 @@ library barback.transformer.wrapping_aggregate_transformer;
 import 'dart:async';
 
 import '../asset/asset_id.dart';
-import '../utils.dart';
 import 'aggregate_transform.dart';
 import 'aggregate_transformer.dart';
 import 'declaring_aggregate_transform.dart';
@@ -44,7 +43,7 @@ class WrappingAggregateTransformer implements AggregateTransformer {
   WrappingAggregateTransformer._(this.transformer);
 
   Future<String> classifyPrimary(AssetId id) {
-    return syncFuture(() => transformer.isPrimary(id))
+    return new Future.sync(() => transformer.isPrimary(id))
         .then((isPrimary) => isPrimary ? id.path : null);
   }
 

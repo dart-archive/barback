@@ -44,7 +44,9 @@ class BuildResult {
 
     return "errors:\n" + errors.map((error) {
       var stackTrace = null;
-      if (error is TransformerException || error is AssetLoadException) {
+      if (error is TransformerException) {
+        stackTrace = error.stackTrace.terse;
+      } else if (error is AssetLoadException) {
         stackTrace = error.stackTrace.terse;
       }
 

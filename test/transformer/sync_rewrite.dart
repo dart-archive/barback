@@ -4,8 +4,6 @@
 
 library barback.test.transformer.sync_rewrite;
 
-import 'dart:async';
-
 import 'package:barback/barback.dart';
 
 /// Like [DeclaringRewriteTransformer], but with no methods returning Futures.

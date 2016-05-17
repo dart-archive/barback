@@ -85,7 +85,7 @@ class DeclaringAggregateTransform extends BaseTransform {
 
 /// The controller for [DeclaringAggregateTransform].
 class DeclaringAggregateTransformController extends BaseTransformController {
-  DeclaringAggregateTransform get transform => super.transform;
+  final DeclaringAggregateTransform transform;
 
   /// The set of ids that the transformer declares it will emit.
   Set<AssetId> get outputIds => transform._outputIds;
@@ -93,7 +93,7 @@ class DeclaringAggregateTransformController extends BaseTransformController {
   bool get isDone => transform._idController.isClosed;
 
   DeclaringAggregateTransformController(TransformNode node)
-      : super(new DeclaringAggregateTransform._(node));
+      : transform = new DeclaringAggregateTransform._(node);
 
   /// Adds a primary input id to the [DeclaringAggregateTransform.primaryIds]
   /// stream.

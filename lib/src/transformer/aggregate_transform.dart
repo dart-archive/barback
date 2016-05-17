@@ -7,6 +7,8 @@ library barback.transformer.aggregate_transform;
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:async/async.dart';
+
 import '../asset/asset.dart';
 import '../asset/asset_id.dart';
 import '../asset/asset_set.dart';
@@ -62,7 +64,7 @@ class AggregateTransform extends BaseTransform {
   /// If an input with [id] cannot be found, throws an [AssetNotFoundException].
   Future<Asset> getInput(AssetId id) {
     if (_emittedPrimaryInputs.containsId(id)) {
-      return syncFuture(() => _emittedPrimaryInputs[id]);
+      return new Future.sync(() => _emittedPrimaryInputs[id]);
     } else {
       return _node.getInput(id);
     }
@@ -79,7 +81,8 @@ class AggregateTransform extends BaseTransform {
   /// If an input with [id] cannot be found, throws an [AssetNotFoundException].
   Future<String> readInputAsString(AssetId id, {Encoding encoding}) {
     if (encoding == null) encoding = UTF8;
-    return getInput(id).then((input) => input.readAsString(encoding: encoding));
+    return getInput(id).then/*<Future<String>>*/(
+        (input) => input.readAsString(encoding: encoding));
   }
 
   /// A convenience method to the contents of the input with [id].
@@ -97,10 +100,11 @@ class AggregateTransform extends BaseTransform {
   /// This is equivalent to calling [getInput] and catching an
   /// [AssetNotFoundException].
   Future<bool> hasInput(AssetId id) {
-    return getInput(id).then((_) => true).catchError((error) {
+    return DelegatingFuture.typed(
+        getInput(id).then((_) => true).catchError((error) {
       if (error is AssetNotFoundException && error.id == id) return false;
       throw error;
-    });
+    }));
   }
 
   /// Stores [output] as an output created by this transformation.
@@ -124,7 +128,7 @@ class AggregateTransform extends BaseTransform {
 
 /// The controller for [AggregateTransform].
 class AggregateTransformController extends BaseTransformController {
-  AggregateTransform get transform => super.transform;
+  final AggregateTransform transform;
 
   /// The set of assets that the transformer has emitted.
   AssetSet get outputs => transform._outputs;
@@ -132,7 +136,7 @@ class AggregateTransformController extends BaseTransformController {
   bool get isDone => transform._inputController.isClosed;
 
   AggregateTransformController(TransformNode node)
-      : super(new AggregateTransform._(node));
+      : transform = new AggregateTransform._(node);
 
   /// Adds a primary input asset to the [AggregateTransform.primaryInputs]
   /// stream.

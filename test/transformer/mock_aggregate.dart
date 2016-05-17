@@ -153,10 +153,9 @@ abstract class MockAggregateTransformer extends AggregateTransformer {
   /// Like [AggregateTransform.getInput], but respects [pauseGetInput].
   ///
   /// This is intended for use by subclasses of [MockAggregateTransformer].
-  Future<Asset> getInput(AggregateTransform transform, AssetId id) {
-    return newFuture(() {
-      if (_getInput.containsKey(id)) return _getInput[id].future;
-    }).then((_) => transform.getInput(id));
+  Future<Asset> getInput(AggregateTransform transform, AssetId id) async {
+    if (_getInput.containsKey(id)) await _getInput[id].future;
+    return await transform.getInput(id);
   }
 
   /// Like [AggregateTransform.primaryInputs], but respects
@@ -169,14 +168,10 @@ abstract class MockAggregateTransformer extends AggregateTransformer {
     }).then((_) => transform.primaryInputs));
   }
 
-  Future<String> classifyPrimary(AssetId id) {
-    return newFuture(() => doClassifyPrimary(id)).then((result) {
-      return newFuture(() {
-        if (_classifyPrimary.containsKey(id)) {
-          return _classifyPrimary[id].future;
-        }
-      }).then((_) => result);
-    });
+  Future<String> classifyPrimary(AssetId id) async {
+    var result = await doClassifyPrimary(id);
+    if (_classifyPrimary.containsKey(id)) await _classifyPrimary[id].future;
+    return result;
   }
 
   Future apply(AggregateTransform transform) {

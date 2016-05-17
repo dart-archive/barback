@@ -4,8 +4,6 @@
 
 library barback.test.transformer.declaring_check_content_and_rename;
 
-import 'dart:async';
-
 import 'package:barback/barback.dart';
 
 import 'check_content_and_rename.dart';

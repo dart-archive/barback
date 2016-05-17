@@ -152,10 +152,9 @@ abstract class MockTransformer extends Transformer {
   /// Like [Transform.getInput], but respects [pauseGetInput].
   ///
   /// This is intended for use by subclasses of [MockTransformer].
-  Future<Asset> getInput(Transform transform, AssetId id) {
-    return newFuture(() {
-      if (_getInput.containsKey(id)) return _getInput[id].future;
-    }).then((_) => transform.getInput(id));
+  Future<Asset> getInput(Transform transform, AssetId id) async {
+    if (_getInput.containsKey(id)) await _getInput[id].future;
+    return await transform.getInput(id);
   }
 
   /// Like [Transform.primaryInput], but respects [pauseGetPrimary].
@@ -167,14 +166,10 @@ abstract class MockTransformer extends Transformer {
     }).then((_) => transform.primaryInput);
   }
 
-  Future<bool> isPrimary(AssetId id) {
-    return newFuture(() => doIsPrimary(id)).then((result) {
-      return newFuture(() {
-        if (_isPrimary.containsKey(id)) {
-          return _isPrimary[id].future;
-        }
-      }).then((_) => result);
-    });
+  Future<bool> isPrimary(AssetId id) async {
+    var result = await doIsPrimary(id);
+    if (_isPrimary.containsKey(id)) await _isPrimary[id].future;
+    return result;
   }
 
   Future apply(Transform transform) {

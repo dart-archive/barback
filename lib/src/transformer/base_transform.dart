@@ -76,7 +76,7 @@ abstract class BaseTransform {
 /// [BaseTransform] without exposing getters in the public API.
 abstract class BaseTransformController {
   /// The [BaseTransform] controlled by this controller.
-  final BaseTransform transform;
+  BaseTransform get transform;
 
   /// The ids of primary inputs that should be consumed.
   Set<AssetId> get consumedPrimaries => transform._consumedPrimaries;
@@ -91,8 +91,6 @@ abstract class BaseTransformController {
   ///
   /// See also [done].
   bool get isDone;
-
-  BaseTransformController(this.transform);
 
   /// Mark this transform as finished emitting new inputs or input ids.
   ///

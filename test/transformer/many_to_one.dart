@@ -25,24 +25,23 @@ class ManyToOneTransformer extends MockTransformer {
 
   bool doIsPrimary(AssetId id) => id.extension == ".$extension";
 
-  Future doApply(Transform transform) {
-    return getPrimary(transform)
-        .then((primary) => primary.readAsString())
-        .then((contents) {
-      // Get all of the included inputs.
-      return Future.wait(contents.split(",").map((path) {
-        var id;
-        if (path.contains("|")) {
-          id = new AssetId.parse(path);
-        } else {
-          id = new AssetId(transform.primaryInput.id.package, path);
-        }
-        return getInput(transform, id).then((input) => input.readAsString());
-      }));
-    }).then((outputs) {
-      var id = transform.primaryInput.id.changeExtension(".out");
-      transform.addOutput(new Asset.fromString(id, outputs.join()));
-    });
+  Future doApply(Transform transform) async {
+    var primary = await getPrimary(transform);
+    var contents = await primary.readAsString();
+
+    // Get all of the included inputs.
+    var outputs = await Future.wait(contents.split(",").map((path) {
+      var id;
+      if (path.contains("|")) {
+        id = new AssetId.parse(path);
+      } else {
+        id = new AssetId(transform.primaryInput.id.package, path);
+      }
+      return getInput(transform, id).then((input) => input.readAsString());
+    }));
+
+    var id = transform.primaryInput.id.changeExtension(".out");
+    transform.addOutput(new Asset.fromString(id, outputs.join()));
   }
 
   String toString() => "many->1 $extension";

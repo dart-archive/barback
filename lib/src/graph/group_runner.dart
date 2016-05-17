@@ -35,7 +35,7 @@ class GroupRunner {
 
   /// A stream that emits an event every time the group's status changes.
   Stream<NodeStatus> get onStatusChange => _onStatusChange;
-  Stream _onStatusChange;
+  Stream<NodeStatus> _onStatusChange;
 
   /// A stream that emits any new assets emitted by [this].
   ///

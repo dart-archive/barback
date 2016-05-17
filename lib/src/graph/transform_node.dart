@@ -6,6 +6,8 @@ library barback.graph.transform_node;
 
 import 'dart:async';
 
+import 'package:async/async.dart';
+
 import '../asset/asset.dart';
 import '../asset/asset_id.dart';
 import '../asset/asset_node.dart';
@@ -443,7 +445,7 @@ class TransformNode {
     }
     _maybeFinishDeclareController();
 
-    syncFuture(() {
+    new Future.sync(() {
       return (transformer as DeclaringAggregateTransformer)
           .declareOutputs(controller.transform);
     }).whenComplete(() {
@@ -643,7 +645,7 @@ class TransformNode {
 
     var transformCounterTimer;
 
-    return syncFuture(() {
+    return DelegatingFuture.typed(new Future.sync(() {
       _timeInTransformer.reset();
       _timeAwaitingInputs.reset();
       _timeInTransformer.start();
@@ -725,7 +727,7 @@ class TransformNode {
       // is so a broken transformer doesn't take down the whole graph.
       phase.cascade.reportError(_wrapException(error, stackTrace));
       return true;
-    });
+    }));
   }
 
   /// Handle the results of running [Transformer.apply].
