@@ -1,3 +1,7 @@
+## 0.15.2+9
+
+* Fix all strong-mode warnings in Dart 1.18.
+
 ## 0.15.2+8
 
 * Fix all strong-mode warnings in Dart 1.16.
