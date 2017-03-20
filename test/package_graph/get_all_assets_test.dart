@@ -7,6 +7,7 @@ library barback.test.barback_test;
 import 'dart:async';
 
 import 'package:barback/barback.dart';
+import 'package:barback/src/utils.dart';
 import 'package:scheduled_test/scheduled_test.dart';
 
 import '../utils.dart';
@@ -76,6 +77,26 @@ main() {
       isTransformerException(equals(BadTransformer.ERROR)),
       isTransformerException(equals(BadTransformer.ERROR))
     ]));
+  });
+
+  test("completes with error after successful build", () {
+    initGraph([
+      "app|foo.txt"
+    ], {
+      "app": [
+        [
+          new BadTransformer(["app|foo.out"])
+        ]
+      ]
+    });
+
+    updateSources(["app|foo.txt"]);
+    schedule(() => pumpEventQueue());
+    updateTransformers("app", [
+      [new RewriteTransformer("blub", "blub")]
+    ]);
+    expectAllAssetsShouldFail(
+        isTransformerException(equals(BadTransformer.ERROR)));
   });
 
   // Regression test.
