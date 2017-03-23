@@ -1,3 +1,9 @@
+## 0.15.2+10
+
+* Update `CancelableFuture` to match the new `Future.then` type signature. The
+  `onValue` parameter now has a return type of `FutureOr<S>` instead of
+  `S`.
+
 ## 0.15.2+9
 
 * Fix all strong-mode warnings in Dart 1.18.
