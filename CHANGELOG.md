@@ -1,3 +1,8 @@
+## 0.15.2+11
+
+* Update `AssetNode.whenAvailable` to be a generic method to fix a new strong
+  mode error.
+
 ## 0.15.2+10
 
 * Update `CancelableFuture` to match the new `Future.then` type signature. The
