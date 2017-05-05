@@ -219,7 +219,7 @@ main() {
     buildShouldSucceed();
   });
 
-  test("cyclic dependencies between package cascades are supported", () {
+  skip_test("cyclic dependencies between package cascades are supported", () {
     initGraph({
       "pkg1|a.txt": "pkg1",
       "pkg2|a.txt": "pkg2"
