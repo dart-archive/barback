@@ -8,7 +8,6 @@ import 'package:markdown/markdown.dart';
 import 'dart:async';
 
 class ConvertMarkdown extends Transformer {
-
   // A constructor named "asPlugin" is required. It can be empty, but
   // it must be present. It is how pub determines that you want this
   // class to be publicly available as a loadable transformer plugin.

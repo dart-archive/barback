@@ -24,8 +24,8 @@ class CheckContentTransformer extends MockTransformer {
       return primary.readAsString().then((value) {
         if (!value.contains(content)) return;
 
-        transform.addOutput(
-            new Asset.fromString(primary.id, "$value$addition"));
+        transform
+            .addOutput(new Asset.fromString(primary.id, "$value$addition"));
       });
     });
   }

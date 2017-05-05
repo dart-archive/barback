@@ -57,8 +57,8 @@ class PackageGraph {
   final _logController = new StreamController<LogEntry>.broadcast(sync: true);
 
   /// How far along [this] is in processing its assets.
-  NodeStatus get _status => NodeStatus.dirtiest(
-      _cascades.values.map((cascade) => cascade.status));
+  NodeStatus get _status =>
+      NodeStatus.dirtiest(_cascades.values.map((cascade) => cascade.status));
 
   /// Whether a [BuildResult] is scheduled to be emitted on [results] (see
   /// [_tryScheduleResult]).
@@ -174,9 +174,9 @@ class PackageGraph {
     }
 
     // Otherwise, return all of the final output assets.
-    return Future.wait(_cascades.values.map(
-            (cascade) => cascade.availableOutputs))
-          .then((assetSets) {
+    return Future
+        .wait(_cascades.values.map((cascade) => cascade.availableOutputs))
+        .then((assetSets) {
       var assets = unionAll(assetSets.map((assetSet) => assetSet.toSet()));
       return new AssetSet.from(assets);
     });
@@ -225,8 +225,8 @@ class PackageGraph {
   void _onLog(LogEntry entry) {
     if (entry.level == LogLevel.ERROR) {
       // TODO(nweiz): keep track of stack chain.
-      _accumulatedErrors.add(
-          new TransformerException(entry.transform, entry.message, null));
+      _accumulatedErrors
+          .add(new TransformerException(entry.transform, entry.message, null));
     }
 
     if (_logController.hasListener) {
@@ -275,9 +275,10 @@ class PackageGraph {
   /// to the returned [Future] as well. Any other exceptions will be piped to
   /// [results].
   Future/*<T>*/ _inErrorZone/*<T>*/(/*=T*/ body()) {
-    var completer = new Completer/*<T>*/.sync();
+    var completer = new Completer/*<T>*/ .sync();
     runZoned(() {
-      new Future.sync(body).then(completer.complete)
+      new Future.sync(body)
+          .then(completer.complete)
           .catchError((error, stackTrace) {
         if (error is! BarbackException) throw error;
         completer.completeError(error, stackTrace);

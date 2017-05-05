@@ -83,19 +83,19 @@ void initConfig() {
 ///
 /// [transformers] is a map from package names to the transformers for each
 /// package.
-void initGraph([assets,
-      Map<String, Iterable<Iterable<Transformer>>> transformers]) =>
+void initGraph(
+        [assets, Map<String, Iterable<Iterable<Transformer>>> transformers]) =>
     initStaticGraph(assets, transformers: transformers);
 
-void initStaticGraph(assets, {Iterable<String> staticPackages,
+void initStaticGraph(assets,
+    {Iterable<String> staticPackages,
     Map<String, Iterable<Iterable<Transformer>>> transformers}) {
   if (assets == null) assets = [];
   if (staticPackages == null) staticPackages = [];
   if (transformers == null) transformers = {};
 
   _provider = new MockProvider(assets,
-      staticPackages: staticPackages,
-      additionalPackages: transformers.keys);
+      staticPackages: staticPackages, additionalPackages: transformers.keys);
   _barback = new Barback(_provider);
   // Add a dummy listener to the log so it doesn't print to stdout.
   _barback.log.listen((_) {});
@@ -115,8 +115,8 @@ void initStaticGraph(assets, {Iterable<String> staticPackages,
 /// parsed as one.
 void updateSources(Iterable assets) {
   var parsed = _parseAssets(assets);
-  schedule(() => _barback.updateSources(parsed),
-      "updating ${parsed.join(', ')}");
+  schedule(
+      () => _barback.updateSources(parsed), "updating ${parsed.join(', ')}");
 }
 
 /// Updates [assets] in the current [PackageProvider].
@@ -133,8 +133,8 @@ void updateSourcesSync(Iterable assets) =>
 /// parsed as one.
 void removeSources(Iterable assets) {
   var parsed = _parseAssets(assets);
-  schedule(() => _barback.removeSources(parsed),
-      "removing ${parsed.join(', ')}");
+  schedule(
+      () => _barback.removeSources(parsed), "removing ${parsed.join(', ')}");
 }
 
 /// Removes [assets] from the current [PackageProvider].
@@ -201,20 +201,20 @@ void resumeProvider() {
 /// [buildShouldFail], so those can be used to validate build results before and
 /// after this.
 void buildShouldNotBeDone() {
-  _futureShouldNotCompleteUntil(
-      _barback.results.elementAt(_nextBuildResult),
-      schedule(() => pumpEventQueue(), "build should not terminate"),
-      "build");
+  _futureShouldNotCompleteUntil(_barback.results.elementAt(_nextBuildResult),
+      schedule(() => pumpEventQueue(), "build should not terminate"), "build");
 }
 
 /// Expects that the next [BuildResult] is a build success.
 void buildShouldSucceed() {
-  expect(_getNextBuildResult("build should succeed").then((result) {
-    for (var error in result.errors) {
-      currentSchedule.signalError(error);
-    }
-    expect(result.succeeded, isTrue);
-  }), completes);
+  expect(
+      _getNextBuildResult("build should succeed").then((result) {
+        for (var error in result.errors) {
+          currentSchedule.signalError(error);
+        }
+        expect(result.succeeded, isTrue);
+      }),
+      completes);
 }
 
 /// Expects that the next [BuildResult] emitted is a failure.
@@ -223,33 +223,36 @@ void buildShouldSucceed() {
 /// build to fail. Every matcher is expected to match an error, but the order of
 /// matchers is unimportant.
 void buildShouldFail(List matchers) {
-  expect(_getNextBuildResult("build should fail").then((result) {
-    expect(result.succeeded, isFalse);
-    expect(result.errors.length, equals(matchers.length));
-    for (var matcher in matchers) {
-      expect(result.errors, contains(matcher));
-    }
-  }), completes);
+  expect(
+      _getNextBuildResult("build should fail").then((result) {
+        expect(result.succeeded, isFalse);
+        expect(result.errors.length, equals(matchers.length));
+        for (var matcher in matchers) {
+          expect(result.errors, contains(matcher));
+        }
+      }),
+      completes);
 }
 
 /// Expects that the nexted logged [LogEntry] matches [matcher] which may be
 /// either a [Matcher] or a string to match a literal string.
 void buildShouldLog(LogLevel level, matcher) {
-  expect(_getNextLog("build should log").then((log) {
-    expect(log.level, equals(level));
-    expect(log.message, matcher);
-  }), completes);
+  expect(
+      _getNextLog("build should log").then((log) {
+        expect(log.level, equals(level));
+        expect(log.message, matcher);
+      }),
+      completes);
 }
 
 Future<BuildResult> _getNextBuildResult(String description) {
-  var result = currentSchedule.wrapFuture(
-      _barback.results.elementAt(_nextBuildResult++));
+  var result = currentSchedule
+      .wrapFuture(_barback.results.elementAt(_nextBuildResult++));
   return schedule(() => result, description);
 }
 
 Future<LogEntry> _getNextLog(String description) {
-  var result = currentSchedule.wrapFuture(
-      _barback.log.elementAt(_nextLog++));
+  var result = currentSchedule.wrapFuture(_barback.log.elementAt(_nextLog++));
   return schedule(() => result, description);
 }
 
@@ -350,9 +353,7 @@ void expectAssetDoesNotComplete(String name) {
 
   schedule(() {
     return _futureShouldNotCompleteUntil(
-        _barback.getAssetById(id),
-        pumpEventQueue(),
-        "asset $id");
+        _barback.getAssetById(id), pumpEventQueue(), "asset $id");
   }, "asset $id should not complete");
 }
 
@@ -368,8 +369,8 @@ Matcher isAggregateException(Iterable<Matcher> errors) {
 
   // Make sure its contained errors match the matchers.
   for (var error in errors) {
-    matchers.add(transform((error) => error.errors, contains(error),
-        error.toString()));
+    matchers.add(
+        transform((error) => error.errors, contains(error), error.toString()));
   }
 
   return allOf(matchers);
@@ -378,32 +379,28 @@ Matcher isAggregateException(Iterable<Matcher> errors) {
 /// Returns a matcher for an [AssetNotFoundException] with the given [id].
 Matcher isAssetNotFoundException(String name) {
   var id = new AssetId.parse(name);
-  return allOf(
-      new isInstanceOf<AssetNotFoundException>(),
+  return allOf(new isInstanceOf<AssetNotFoundException>(),
       predicate((error) => error.id == id, 'id == $name'));
 }
 
 /// Returns a matcher for an [AssetCollisionException] with the given [id].
 Matcher isAssetCollisionException(String name) {
   var id = new AssetId.parse(name);
-  return allOf(
-      new isInstanceOf<AssetCollisionException>(),
+  return allOf(new isInstanceOf<AssetCollisionException>(),
       predicate((error) => error.id == id, 'id == $name'));
 }
 
 /// Returns a matcher for a [MissingInputException] with the given [id].
 Matcher isMissingInputException(String name) {
   var id = new AssetId.parse(name);
-  return allOf(
-      new isInstanceOf<MissingInputException>(),
+  return allOf(new isInstanceOf<MissingInputException>(),
       predicate((error) => error.id == id, 'id == $name'));
 }
 
 /// Returns a matcher for an [InvalidOutputException] with the given id.
 Matcher isInvalidOutputException(String name) {
   var id = new AssetId.parse(name);
-  return allOf(
-      new isInstanceOf<InvalidOutputException>(),
+  return allOf(new isInstanceOf<InvalidOutputException>(),
       predicate((error) => error.id == id, 'id == $name'));
 }
 
@@ -420,16 +417,14 @@ Matcher isAssetLoadException(String name, error) {
 /// Returns a matcher for a [TransformerException] with a wrapped error that
 /// matches [error].
 Matcher isTransformerException(error) {
-  return allOf(
-      new isInstanceOf<TransformerException>(),
+  return allOf(new isInstanceOf<TransformerException>(),
       transform((error) => error.error, wrapMatcher(error), 'error'));
 }
 
 /// Returns a matcher for a [MockLoadException] with the given [id].
 Matcher isMockLoadException(String name) {
   var id = new AssetId.parse(name);
-  return allOf(
-      new isInstanceOf<MockLoadException>(),
+  return allOf(new isInstanceOf<MockLoadException>(),
       predicate((error) => error.id == id, 'id == $name'));
 }
 
@@ -439,7 +434,7 @@ Matcher isMockLoadException(String name) {
 /// [description] should be a noun phrase that describes the relation of the
 /// output of [transformation] to its input.
 Matcher transform(transformation(value), matcher, String description) =>
-  new _TransformMatcher(transformation, wrapMatcher(matcher), description);
+    new _TransformMatcher(transformation, wrapMatcher(matcher), description);
 
 class _TransformMatcher extends Matcher {
   final Function _transformation;
@@ -449,10 +444,10 @@ class _TransformMatcher extends Matcher {
   _TransformMatcher(this._transformation, this._matcher, this._description);
 
   bool matches(item, Map matchState) =>
-    _matcher.matches(_transformation(item), matchState);
+      _matcher.matches(_transformation(item), matchState);
 
   Description describe(Description description) =>
-    description.add(_description).add(' ').addDescriptionOf(_matcher);
+      description.add(_description).add(' ').addDescriptionOf(_matcher);
 }
 
 /// Asserts that [future] shouldn't complete until after [delay] completes.
@@ -461,8 +456,8 @@ class _TransformMatcher extends Matcher {
 /// error.
 ///
 /// [description] should describe [future].
-Future _futureShouldNotCompleteUntil(Future future, Future delay,
-    String description) {
+Future _futureShouldNotCompleteUntil(
+    Future future, Future delay, String description) {
   var trace = new Trace.current();
   var cancelable = new CancelableFuture(future);
   cancelable.then((result) {
@@ -512,14 +507,14 @@ class MockProvider implements StaticPackageProvider {
     _pauseCompleter = null;
   }
 
-  MockProvider(assets, {Iterable<String> staticPackages,
-          Iterable<String> additionalPackages})
-      : staticPackages = staticPackages == null ? new Set() :
-            staticPackages.toSet(),
+  MockProvider(assets,
+      {Iterable<String> staticPackages, Iterable<String> additionalPackages})
+      : staticPackages =
+            staticPackages == null ? new Set() : staticPackages.toSet(),
         _assets = _normalizeAssets(assets, additionalPackages);
 
-  static Map<String, AssetSet> _normalizeAssets(assets,
-      Iterable<String> additionalPackages) {
+  static Map<String, AssetSet> _normalizeAssets(
+      assets, Iterable<String> additionalPackages) {
     Iterable<Asset> assetList;
     if (assets is Map) {
       assetList = assets.keys.map((asset) {
@@ -534,8 +529,7 @@ class MockProvider implements StaticPackageProvider {
       });
     }
 
-    var assetMap = mapMapValues(
-        groupBy(assetList, (asset) => asset.id.package),
+    var assetMap = mapMapValues(groupBy(assetList, (asset) => asset.id.package),
         (_, assets) => new AssetSet.from(assets));
 
     // Make sure that packages that have transformers but no assets are

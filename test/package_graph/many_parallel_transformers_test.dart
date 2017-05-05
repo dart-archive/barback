@@ -16,7 +16,11 @@ main() {
     currentSchedule.timeout *= 3;
     var files = new List.generate(100, (i) => "app|$i.txt");
     var rewrite = new RewriteTransformer("txt", "out");
-    initGraph(files, {"app": [[rewrite]]});
+    initGraph(files, {
+      "app": [
+        [rewrite]
+      ]
+    });
 
     // Pause and resume apply to simulate parallel long-running transformers.
     rewrite.pauseApply();

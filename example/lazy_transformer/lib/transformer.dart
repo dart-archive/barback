@@ -7,7 +7,6 @@ import 'package:barback/barback.dart';
 import 'dart:async';
 
 class CodedMessageConverter extends Transformer implements LazyTransformer {
-
   // A constructor named "asPlugin" is required. It can be empty, but
   // it must be present.
   CodedMessageConverter.asPlugin();
@@ -33,9 +32,12 @@ class CodedMessageConverter extends Transformer implements LazyTransformer {
 
   rot13(var ch) {
     var c = ch.codeUnitAt(0);
-    if (c >= 'a'.codeUnitAt(0) && c <= 'm'.codeUnitAt(0)) c += 13;
-    else if (c >= 'A'.codeUnitAt(0) && c <= 'M'.codeUnitAt(0)) c += 13;
-    else if (c >= 'n'.codeUnitAt(0) && c <= 'z'.codeUnitAt(0)) c -= 13;
+    if (c >= 'a'.codeUnitAt(0) && c <= 'm'.codeUnitAt(0))
+      c += 13;
+    else if (c >= 'A'.codeUnitAt(0) && c <= 'M'.codeUnitAt(0))
+      c += 13;
+    else if (c >= 'n'.codeUnitAt(0) && c <= 'z'.codeUnitAt(0))
+      c -= 13;
     else if (c >= 'N'.codeUnitAt(0) && c <= 'Z'.codeUnitAt(0)) c -= 13;
     return new String.fromCharCode(c);
   }

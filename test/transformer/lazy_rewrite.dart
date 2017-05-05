@@ -12,6 +12,5 @@ import 'declaring_rewrite.dart';
 /// rewrite until it's materialized.
 class LazyRewriteTransformer extends DeclaringRewriteTransformer
     implements LazyTransformer {
-  LazyRewriteTransformer(String from, String to)
-      : super(from, to);
+  LazyRewriteTransformer(String from, String to) : super(from, to);
 }

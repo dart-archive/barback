@@ -20,8 +20,12 @@ main() {
       "info: This is info.",
       "fine: This is fine."
     ]);
-    initGraph(["app|foo.txt"], {
-      "app": [[transformer]]
+    initGraph([
+      "app|foo.txt"
+    ], {
+      "app": [
+        [transformer]
+      ]
     });
 
     updateSources(["app|foo.txt"]);
@@ -39,9 +43,17 @@ main() {
       "fine: This is fine."
     ]);
 
-    initGraph(["app|foo.txt"], {"app": [
-      [new TransformerGroup([[transformer]])]
-    ]});
+    initGraph([
+      "app|foo.txt"
+    ], {
+      "app": [
+        [
+          new TransformerGroup([
+            [transformer]
+          ])
+        ]
+      ]
+    });
 
     updateSources(["app|foo.txt"]);
     buildShouldLog(LogLevel.ERROR, equals("This is an error."));

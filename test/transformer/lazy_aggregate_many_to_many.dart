@@ -13,6 +13,5 @@ import 'declaring_aggregate_many_to_many.dart';
 class LazyAggregateManyToManyTransformer
     extends DeclaringAggregateManyToManyTransformer
     implements LazyAggregateTransformer {
-  LazyAggregateManyToManyTransformer(String extension)
-      : super(extension);
+  LazyAggregateManyToManyTransformer(String extension) : super(extension);
 }

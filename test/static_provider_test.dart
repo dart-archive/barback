@@ -25,8 +25,12 @@ main() {
     initStaticGraph({
       "static|b.inc": "b",
       "app|a.txt": "static|b.inc"
-    }, staticPackages: ["static"], transformers: {
-      "app": [[new ManyToOneTransformer("txt")]]
+    }, staticPackages: [
+      "static"
+    ], transformers: {
+      "app": [
+        [new ManyToOneTransformer("txt")]
+      ]
     });
     updateSources(["app|a.txt"]);
     expectAsset("app|a.out", "b");

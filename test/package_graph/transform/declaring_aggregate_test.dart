@@ -13,9 +13,15 @@ main() {
   initConfig();
   group("a declaring aggregate transformer", () {
     test("is eager by default", () {
-      var transformer = new DeclaringAggregateManyToOneTransformer(
-          "txt", "out.txt");
-      initGraph(["app|foo.txt"], {"app": [[transformer]]});
+      var transformer =
+          new DeclaringAggregateManyToOneTransformer("txt", "out.txt");
+      initGraph([
+        "app|foo.txt"
+      ], {
+        "app": [
+          [transformer]
+        ]
+      });
 
       updateSources(["app|foo.txt"]);
       buildShouldSucceed();
@@ -25,11 +31,17 @@ main() {
 
     test("is deferred if any primary input is deferred", () {
       var rewrite = new LazyRewriteTransformer("in", "txt");
-      var aggregate = new DeclaringAggregateManyToOneTransformer(
-          "txt", "out.txt");
-      initGraph(["app|foo.in", "app|bar.txt", "app|baz.txt"], {"app": [
-        [rewrite]
-      ]});
+      var aggregate =
+          new DeclaringAggregateManyToOneTransformer("txt", "out.txt");
+      initGraph([
+        "app|foo.in",
+        "app|bar.txt",
+        "app|baz.txt"
+      ], {
+        "app": [
+          [rewrite]
+        ]
+      });
 
       updateSources(["app|foo.in", "app|bar.txt", "app|baz.txt"]);
       buildShouldSucceed();
@@ -37,7 +49,10 @@ main() {
       // Add [aggregate] to the graph after a build has been completed so that
       // all its inputs are available immediately. Otherwise it could start
       // applying eagerly before receiving its lazy input.
-      updateTransformers("app", [[rewrite], [aggregate]]);
+      updateTransformers("app", [
+        [rewrite],
+        [aggregate]
+      ]);
       buildShouldSucceed();
       expect(aggregate.numRuns, completion(equals(0)));
 
@@ -48,12 +63,18 @@ main() {
 
     test("switches from eager to deferred if a deferred primary input is added",
         () {
-      var transformer = new DeclaringAggregateManyToOneTransformer(
-          "txt", "out.txt");
-      initGraph(["app|foo.in", "app|bar.txt", "app|baz.txt"], {"app": [
-        [new LazyRewriteTransformer("in", "txt")],
-        [transformer]
-      ]});
+      var transformer =
+          new DeclaringAggregateManyToOneTransformer("txt", "out.txt");
+      initGraph([
+        "app|foo.in",
+        "app|bar.txt",
+        "app|baz.txt"
+      ], {
+        "app": [
+          [new LazyRewriteTransformer("in", "txt")],
+          [transformer]
+        ]
+      });
 
       updateSources(["app|bar.txt", "app|baz.txt"]);
       buildShouldSucceed();
@@ -68,14 +89,21 @@ main() {
       expect(transformer.numRuns, completion(equals(2)));
     });
 
-    test("switches from deferred to eager if its last deferred primary input "
+    test(
+        "switches from deferred to eager if its last deferred primary input "
         "is removed", () {
       var rewrite = new LazyRewriteTransformer("in", "txt");
-      var aggregate = new DeclaringAggregateManyToOneTransformer(
-          "txt", "out.txt");
-      initGraph(["app|foo.in", "app|bar.txt", "app|baz.txt"], {"app": [
-        [rewrite]
-      ]});
+      var aggregate =
+          new DeclaringAggregateManyToOneTransformer("txt", "out.txt");
+      initGraph([
+        "app|foo.in",
+        "app|bar.txt",
+        "app|baz.txt"
+      ], {
+        "app": [
+          [rewrite]
+        ]
+      });
 
       updateSources(["app|foo.in", "app|bar.txt", "app|baz.txt"]);
       buildShouldSucceed();
@@ -83,7 +111,10 @@ main() {
       // Add [aggregate] to the graph after a build has been completed so that
       // all its inputs are available immediately. Otherwise it could start
       // applying eagerly before receiving its lazy input.
-      updateTransformers("app", [[rewrite], [aggregate]]);
+      updateTransformers("app", [
+        [rewrite],
+        [aggregate]
+      ]);
       buildShouldSucceed();
       expect(aggregate.numRuns, completion(equals(0)));
 
@@ -92,7 +123,8 @@ main() {
       expect(aggregate.numRuns, completion(equals(1)));
     });
 
-    test("begins running eagerly when all its deferred primary inputs become "
+    test(
+        "begins running eagerly when all its deferred primary inputs become "
         "available", () {
       var lazyPhase = [
         new LazyAssetsTransformer(["app|foo.txt", "app|foo.x"],
@@ -100,11 +132,17 @@ main() {
         new LazyAssetsTransformer(["app|bar.txt", "app|bar.x"],
             input: "app|bar.in")
       ];
-      var transformer = new DeclaringAggregateManyToOneTransformer(
-          "txt", "out.txt");
-      initGraph(["app|foo.in", "app|bar.in", "app|baz.txt"], {"app": [
-        lazyPhase,
-      ]});
+      var transformer =
+          new DeclaringAggregateManyToOneTransformer("txt", "out.txt");
+      initGraph([
+        "app|foo.in",
+        "app|bar.in",
+        "app|baz.txt"
+      ], {
+        "app": [
+          lazyPhase,
+        ]
+      });
 
       updateSources(["app|foo.in", "app|bar.in", "app|baz.txt"]);
       buildShouldSucceed();
@@ -112,7 +150,10 @@ main() {
       // Add [transformer] to the graph after a build has been completed so that
       // all its inputs are available immediately. Otherwise it could start
       // applying eagerly before receiving its lazy inputs.
-      updateTransformers("app", [lazyPhase, [transformer]]);
+      updateTransformers("app", [
+        lazyPhase,
+        [transformer]
+      ]);
       buildShouldSucceed();
       expect(transformer.numRuns, completion(equals(0)));
 
@@ -129,7 +170,8 @@ main() {
       expect(transformer.numRuns, completion(equals(1)));
     });
 
-    test("stops running eagerly when any of its deferred primary inputs become "
+    test(
+        "stops running eagerly when any of its deferred primary inputs become "
         "unavailable", () {
       var lazyPhase = [
         new LazyAssetsTransformer(["app|foo.txt", "app|foo.x"],
@@ -137,11 +179,15 @@ main() {
         new LazyAssetsTransformer(["app|bar.txt", "app|bar.x"],
             input: "app|bar.in")
       ];
-      var transformer = new DeclaringAggregateManyToOneTransformer(
-          "txt", "out.txt");
-      initGraph(["app|foo.in", "app|bar.in", "app|baz.txt"], {"app": [
-        lazyPhase
-      ]});
+      var transformer =
+          new DeclaringAggregateManyToOneTransformer("txt", "out.txt");
+      initGraph([
+        "app|foo.in",
+        "app|bar.in",
+        "app|baz.txt"
+      ], {
+        "app": [lazyPhase]
+      });
 
       updateSources(["app|foo.in", "app|bar.in", "app|baz.txt"]);
       expectAsset("app|foo.x", "app|foo.x");
@@ -151,7 +197,10 @@ main() {
       // Add [transformer] to the graph after a build has been completed so that
       // all its inputs are available immediately. Otherwise it could start
       // applying eagerly before receiving its lazy inputs.
-      updateTransformers("app", [lazyPhase, [transformer]]);
+      updateTransformers("app", [
+        lazyPhase,
+        [transformer]
+      ]);
       buildShouldSucceed();
       expect(transformer.numRuns, completion(equals(1)));
 
@@ -162,10 +211,16 @@ main() {
     });
 
     test("re-declares its outputs for a new primary input", () {
-      initGraph(["app|foo.in", "app|bar.txt", "app|baz.txt"], {"app": [
-        [new LazyRewriteTransformer("in", "txt")],
-        [new DeclaringAggregateManyToManyTransformer("txt")]
-      ]});
+      initGraph([
+        "app|foo.in",
+        "app|bar.txt",
+        "app|baz.txt"
+      ], {
+        "app": [
+          [new LazyRewriteTransformer("in", "txt")],
+          [new DeclaringAggregateManyToManyTransformer("txt")]
+        ]
+      });
 
       updateSources(["app|foo.in", "app|bar.txt"]);
       buildShouldSucceed();
@@ -179,13 +234,20 @@ main() {
       expectAsset("app|baz.txt", "modified baz");
     });
 
-    test("re-declares its outputs for a new primary input received while "
+    test(
+        "re-declares its outputs for a new primary input received while "
         "applying", () {
       var transformer = new DeclaringAggregateManyToManyTransformer("txt");
-      initGraph(["app|foo.in", "app|bar.txt", "app|baz.txt"], {"app": [
-        [new LazyRewriteTransformer("in", "txt")],
-        [transformer]
-      ]});
+      initGraph([
+        "app|foo.in",
+        "app|bar.txt",
+        "app|baz.txt"
+      ], {
+        "app": [
+          [new LazyRewriteTransformer("in", "txt")],
+          [transformer]
+        ]
+      });
 
       transformer.pauseApply();
       updateSources(["app|foo.in", "app|bar.txt"]);
@@ -200,13 +262,20 @@ main() {
       expectAsset("app|baz.txt", "modified baz");
     });
 
-    test("re-declares its outputs for a new primary input received while "
+    test(
+        "re-declares its outputs for a new primary input received while "
         "applying after a primary input was modified", () {
       var transformer = new DeclaringAggregateManyToManyTransformer("txt");
-      initGraph(["app|foo.in", "app|bar.txt", "app|baz.txt"], {"app": [
-        [new LazyRewriteTransformer("in", "txt")],
-        [transformer]
-      ]});
+      initGraph([
+        "app|foo.in",
+        "app|bar.txt",
+        "app|baz.txt"
+      ], {
+        "app": [
+          [new LazyRewriteTransformer("in", "txt")],
+          [transformer]
+        ]
+      });
 
       transformer.pauseApply();
       updateSources(["app|foo.in", "app|bar.txt"]);
@@ -230,7 +299,13 @@ main() {
   group("a lazy aggregate transformer", () {
     test("doesn't run eagerly", () {
       var transformer = new LazyAggregateManyToOneTransformer("txt", "out.txt");
-      initGraph(["app|foo.txt"], {"app": [[transformer]]});
+      initGraph([
+        "app|foo.txt"
+      ], {
+        "app": [
+          [transformer]
+        ]
+      });
 
       updateSources(["app|foo.txt"]);
       buildShouldSucceed();
@@ -239,9 +314,13 @@ main() {
     });
 
     test("runs when an output is requested", () {
-      initGraph(["app|foo.txt"], {"app": [[
-        new LazyAggregateManyToOneTransformer("txt", "out.txt")
-      ]]});
+      initGraph([
+        "app|foo.txt"
+      ], {
+        "app": [
+          [new LazyAggregateManyToOneTransformer("txt", "out.txt")]
+        ]
+      });
 
       updateSources(["app|foo.txt"]);
       buildShouldSucceed();

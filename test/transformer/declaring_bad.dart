@@ -22,8 +22,8 @@ class DeclaringBadTransformer extends MockTransformer
   /// The id of the output asset to emit.
   final AssetId output;
 
-  DeclaringBadTransformer(String output, {bool declareError: true,
-          bool applyError: false})
+  DeclaringBadTransformer(String output,
+      {bool declareError: true, bool applyError: false})
       : this.output = new AssetId.parse(output),
         this.declareError = declareError,
         this.applyError = applyError;

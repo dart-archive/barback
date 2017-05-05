@@ -61,7 +61,8 @@ main() {
     expect(multiSet.remove(1), isTrue);
   });
 
-  test("remove returns true if the element was in the set even if more copies "
+  test(
+      "remove returns true if the element was in the set even if more copies "
       "remain", () {
     var multiSet = new Multiset.from([1, 1, 1]);
     expect(multiSet.remove(1), isTrue);

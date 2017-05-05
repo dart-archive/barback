@@ -17,7 +17,7 @@ class CreateAssetTransformer extends MockTransformer {
   bool doIsPrimary(AssetId id) => true;
 
   void doApply(Transform transform) {
-    transform.addOutput(
-        new Asset.fromString(new AssetId.parse(output), output));
+    transform
+        .addOutput(new Asset.fromString(new AssetId.parse(output), output));
   }
 }
