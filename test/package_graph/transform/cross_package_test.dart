@@ -4,7 +4,6 @@
 
 library barback.test.package_graph.transform.pass_through_test;
 
-import 'package:barback/src/utils.dart';
 import 'package:scheduled_test/scheduled_test.dart';
 
 import '../../utils.dart';
@@ -15,7 +14,11 @@ main() {
     initGraph({
       "pkg1|a.txt": "pkg2|a.inc",
       "pkg2|a.inc": "a"
-    }, {"pkg1": [[new ManyToOneTransformer("txt")]]});
+    }, {
+      "pkg1": [
+        [new ManyToOneTransformer("txt")]
+      ]
+    });
 
     updateSources(["pkg1|a.txt", "pkg2|a.inc"]);
     expectAsset("pkg1|a.out", "a");
@@ -27,8 +30,12 @@ main() {
       "pkg1|a.txt": "pkg2|a.inc",
       "pkg2|a.txt": "a"
     }, {
-      "pkg1": [[new ManyToOneTransformer("txt")]],
-      "pkg2": [[new RewriteTransformer("txt", "inc")]]
+      "pkg1": [
+        [new ManyToOneTransformer("txt")]
+      ],
+      "pkg2": [
+        [new RewriteTransformer("txt", "inc")]
+      ]
     });
 
     updateSources(["pkg1|a.txt", "pkg2|a.txt"]);
@@ -41,7 +48,9 @@ main() {
       "pkg1|a.txt": "pkg2|a.inc",
       "pkg2|a.inc": "a"
     }, {
-      "pkg1": [[new ManyToOneTransformer("txt")]]
+      "pkg1": [
+        [new ManyToOneTransformer("txt")]
+      ]
     });
 
     updateSources(["pkg1|a.txt", "pkg2|a.inc"]);
@@ -54,14 +63,19 @@ main() {
     buildShouldSucceed();
   });
 
-  test("re-runs a transform when a transformed input from another package "
+  test(
+      "re-runs a transform when a transformed input from another package "
       "changes", () {
     initGraph({
       "pkg1|a.txt": "pkg2|a.inc",
       "pkg2|a.txt": "a"
     }, {
-      "pkg1": [[new ManyToOneTransformer("txt")]],
-      "pkg2": [[new RewriteTransformer("txt", "inc")]]
+      "pkg1": [
+        [new ManyToOneTransformer("txt")]
+      ],
+      "pkg2": [
+        [new RewriteTransformer("txt", "inc")]
+      ]
     });
 
     updateSources(["pkg1|a.txt", "pkg2|a.txt"]);
@@ -74,14 +88,17 @@ main() {
     buildShouldSucceed();
   });
 
-  test("doesn't complete the build until all packages' transforms are "
+  test(
+      "doesn't complete the build until all packages' transforms are "
       "finished running", () {
     var transformer = new ManyToOneTransformer("txt");
     initGraph({
       "pkg1|a.txt": "pkg2|a.inc",
       "pkg2|a.inc": "a"
     }, {
-      "pkg1": [[transformer]]
+      "pkg1": [
+        [transformer]
+      ]
     });
 
     updateSources(["pkg1|a.txt", "pkg2|a.inc"]);
@@ -126,7 +143,8 @@ main() {
     buildShouldSucceed();
   });
 
-  test("doesn't run a transform that's removed because of a change in "
+  test(
+      "doesn't run a transform that's removed because of a change in "
       "another package", () {
     initGraph({
       "pkg1|a.txt": "pkg2|a.inc",
@@ -151,14 +169,19 @@ main() {
     buildShouldSucceed();
   });
 
-  test("sees a transformer that's newly applied to a cross-package "
+  test(
+      "sees a transformer that's newly applied to a cross-package "
       "dependency", () {
     initGraph({
       "pkg1|a.txt": "pkg2|a.inc",
       "pkg2|a.inc": "a"
     }, {
-      "pkg1": [[new ManyToOneTransformer("txt")]],
-      "pkg2": [[new CheckContentTransformer("b", " transformed")]]
+      "pkg1": [
+        [new ManyToOneTransformer("txt")]
+      ],
+      "pkg2": [
+        [new CheckContentTransformer("b", " transformed")]
+      ]
     });
 
     updateSources(["pkg1|a.txt", "pkg2|a.inc"]);
@@ -171,14 +194,19 @@ main() {
     buildShouldSucceed();
   });
 
-  test("doesn't see a transformer that's newly not applied to a "
+  test(
+      "doesn't see a transformer that's newly not applied to a "
       "cross-package dependency", () {
     initGraph({
       "pkg1|a.txt": "pkg2|a.inc",
       "pkg2|a.inc": "a"
     }, {
-      "pkg1": [[new ManyToOneTransformer("txt")]],
-      "pkg2": [[new CheckContentTransformer("a", " transformed")]]
+      "pkg1": [
+        [new ManyToOneTransformer("txt")]
+      ],
+      "pkg2": [
+        [new CheckContentTransformer("a", " transformed")]
+      ]
     });
 
     updateSources(["pkg1|a.txt", "pkg2|a.inc"]);
@@ -188,6 +216,29 @@ main() {
     modifyAsset("pkg2|a.inc", "b");
     updateSources(["pkg2|a.inc"]);
     expectAsset("pkg1|a.out", "b");
+    buildShouldSucceed();
+  });
+
+  test("cyclic dependencies between package cascades are supported", () {
+    initGraph({
+      "pkg1|a.txt": "pkg1",
+      "pkg2|a.txt": "pkg2"
+    }, {
+      "pkg1": [
+        [new CopyContentTransformer("pkg2|a.txt", "pkg1|b.txt")],
+        [new CopyContentTransformer("pkg2|b.txt", "pkg1|c.txt")],
+      ],
+      "pkg2": [
+        [new CopyContentTransformer("pkg1|a.txt", "pkg2|b.txt")],
+        [new CopyContentTransformer("pkg1|b.txt", "pkg2|c.txt")],
+      ]
+    });
+
+    updateSources(["pkg1|a.txt", "pkg2|a.txt"]);
+    expectAsset("pkg1|b.txt", "pkg2");
+    expectAsset("pkg1|c.txt", "pkg2");
+    expectAsset("pkg2|b.txt", "pkg1");
+    expectAsset("pkg2|c.txt", "pkg1");
     buildShouldSucceed();
   });
 }
