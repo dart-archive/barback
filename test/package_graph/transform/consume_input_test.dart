@@ -15,7 +15,9 @@ main() {
     initGraph([
       "app|foo.txt"
     ], {
-      "app": [[new RewriteTransformer("txt", "out")..consumePrimary = true]]
+      "app": [
+        [new RewriteTransformer("txt", "out")..consumePrimary = true]
+      ]
     });
 
     updateSources(["app|foo.txt"]);
@@ -28,10 +30,12 @@ main() {
     initGraph([
       "app|foo.txt"
     ], {
-      "app": [[
-        new RewriteTransformer("txt", "out")..consumePrimary = true,
-        new RewriteTransformer("txt", "txt")
-      ]]
+      "app": [
+        [
+          new RewriteTransformer("txt", "out")..consumePrimary = true,
+          new RewriteTransformer("txt", "txt")
+        ]
+      ]
     });
 
     updateSources(["app|foo.txt"]);
@@ -44,9 +48,9 @@ main() {
     initGraph({
       "app|foo.txt": "yes"
     }, {
-      "app": [[
-        new ConditionallyConsumePrimaryTransformer("txt", "out", "yes")
-      ]]
+      "app": [
+        [new ConditionallyConsumePrimaryTransformer("txt", "out", "yes")]
+      ]
     });
 
     updateSources(["app|foo.txt"]);
@@ -62,11 +66,15 @@ main() {
   });
 
   test("two sibling transforms both consume their input", () {
-    initGraph(["app|foo.txt"], {
-      "app": [[
-        new RewriteTransformer("txt", "one")..consumePrimary = true,
-        new RewriteTransformer("txt", "two")..consumePrimary = true
-      ]]
+    initGraph([
+      "app|foo.txt"
+    ], {
+      "app": [
+        [
+          new RewriteTransformer("txt", "one")..consumePrimary = true,
+          new RewriteTransformer("txt", "two")..consumePrimary = true
+        ]
+      ]
     });
 
     updateSources(["app|foo.txt"]);
@@ -76,15 +84,18 @@ main() {
     buildShouldSucceed();
   });
 
-  test("a transform stops consuming its input but a sibling is still "
+  test(
+      "a transform stops consuming its input but a sibling is still "
       "consuming it", () {
     initGraph({
       "app|foo.txt": "yes"
     }, {
-      "app": [[
-        new RewriteTransformer("txt", "one")..consumePrimary = true,
-        new ConditionallyConsumePrimaryTransformer("txt", "two", "yes")
-      ]]
+      "app": [
+        [
+          new RewriteTransformer("txt", "one")..consumePrimary = true,
+          new ConditionallyConsumePrimaryTransformer("txt", "two", "yes")
+        ]
+      ]
     });
 
     updateSources(["app|foo.txt"]);
@@ -105,7 +116,9 @@ main() {
     initGraph([
       "app|foo.txt"
     ], {
-      "app": [[new EmitNothingTransformer("txt")..consumePrimary = true]]
+      "app": [
+        [new EmitNothingTransformer("txt")..consumePrimary = true]
+      ]
     });
 
     updateSources(["app|foo.txt"]);
@@ -117,7 +130,9 @@ main() {
     initGraph([
       "app|foo.txt"
     ], {
-      "app": [[new RewriteTransformer("txt", "out")..consumePrimary = true]]
+      "app": [
+        [new RewriteTransformer("txt", "out")..consumePrimary = true]
+      ]
     });
 
     updateSources(["app|foo.txt"]);
@@ -131,12 +146,13 @@ main() {
     buildShouldSucceed();
   });
 
-  test("a transform consumes its input and emits nothing, then is removed",
-      () {
+  test("a transform consumes its input and emits nothing, then is removed", () {
     initGraph([
       "app|foo.txt"
     ], {
-      "app": [[new EmitNothingTransformer("txt")..consumePrimary = true]]
+      "app": [
+        [new EmitNothingTransformer("txt")..consumePrimary = true]
+      ]
     });
 
     updateSources(["app|foo.txt"]);
@@ -160,9 +176,9 @@ main() {
     expectAsset("app|foo.txt", "foo");
     buildShouldSucceed();
 
-    updateTransformers("app", [[
-      new RewriteTransformer("txt", "out")..consumePrimary = true
-    ]]);
+    updateTransformers("app", [
+      [new RewriteTransformer("txt", "out")..consumePrimary = true]
+    ]);
     expectAsset("app|foo.out", "foo.out");
     expectNoAsset("app|foo.txt");
     buildShouldSucceed();

@@ -11,7 +11,7 @@ import 'declare_assets.dart';
 /// Like [DeclareAssetsTransformer], but lazy.
 class LazyAssetsTransformer extends DeclareAssetsTransformer
     implements LazyTransformer {
-  LazyAssetsTransformer(Iterable<String> declared, {Iterable<String> emitted,
-        String input})
+  LazyAssetsTransformer(Iterable<String> declared,
+      {Iterable<String> emitted, String input})
       : super(declared, emitted: emitted, input: input);
 }

@@ -26,8 +26,8 @@ class CatchAssetNotFoundTransformer extends MockTransformer {
 
   Future doApply(Transform transform) {
     return transform.getInput(input).then((_) {
-      transform.addOutput(new Asset.fromString(
-          transform.primaryInput.id, "success"));
+      transform.addOutput(
+          new Asset.fromString(transform.primaryInput.id, "success"));
     }).catchError((e) {
       if (e is! AssetNotFoundException) throw e;
       transform.addOutput(new Asset.fromString(

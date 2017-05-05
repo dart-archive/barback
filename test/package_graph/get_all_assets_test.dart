@@ -22,54 +22,72 @@ main() {
   });
 
   test("includes transformed outputs", () {
-    initGraph(["app|a.txt", "app|foo.blub"], {"app": [
-      [new RewriteTransformer("blub", "blab")]
-    ]});
+    initGraph([
+      "app|a.txt",
+      "app|foo.blub"
+    ], {
+      "app": [
+        [new RewriteTransformer("blub", "blab")]
+      ]
+    });
     updateSources(["app|a.txt", "app|foo.blub"]);
     expectAllAssets(["app|a.txt", "app|foo.blub", "app|foo.blab"]);
     buildShouldSucceed();
   });
 
   test("includes overwritten outputs", () {
-    initGraph(["app|a.txt", "app|foo.blub"], {"app": [
-      [new RewriteTransformer("blub", "blub")]
-    ]});
-    updateSources(["app|a.txt", "app|foo.blub"]);
-    expectAllAssets({
-      "app|a.txt": "a",
-      "app|foo.blub": "foo.blub"
+    initGraph([
+      "app|a.txt",
+      "app|foo.blub"
+    ], {
+      "app": [
+        [new RewriteTransformer("blub", "blub")]
+      ]
     });
+    updateSources(["app|a.txt", "app|foo.blub"]);
+    expectAllAssets({"app|a.txt": "a", "app|foo.blub": "foo.blub"});
     buildShouldSucceed();
   });
 
   test("completes to an error if two transformers output the same file", () {
-    initGraph(["app|foo.a"], {"app": [
-      [
-        new RewriteTransformer("a", "b"),
-        new RewriteTransformer("a", "b")
+    initGraph([
+      "app|foo.a"
+    ], {
+      "app": [
+        [new RewriteTransformer("a", "b"), new RewriteTransformer("a", "b")]
       ]
-    ]});
+    });
     updateSources(["app|foo.a"]);
     expectAllAssetsShouldFail(isAssetCollisionException("app|foo.b"));
   });
 
   test("completes to an error if a transformer fails", () {
-    initGraph(["app|foo.txt"], {"app": [
-      [new BadTransformer(["app|foo.out"])]
-    ]});
+    initGraph([
+      "app|foo.txt"
+    ], {
+      "app": [
+        [
+          new BadTransformer(["app|foo.out"])
+        ]
+      ]
+    });
 
     updateSources(["app|foo.txt"]);
-    expectAllAssetsShouldFail(isTransformerException(
-        equals(BadTransformer.ERROR)));
+    expectAllAssetsShouldFail(
+        isTransformerException(equals(BadTransformer.ERROR)));
   });
 
   test("completes to an aggregate error if there are multiple errors", () {
-    initGraph(["app|foo.txt"], {"app": [
-      [
-        new BadTransformer(["app|foo.out"]),
-        new BadTransformer(["app|foo.out2"])
+    initGraph([
+      "app|foo.txt"
+    ], {
+      "app": [
+        [
+          new BadTransformer(["app|foo.out"]),
+          new BadTransformer(["app|foo.out2"])
+        ]
       ]
-    ]});
+    });
 
     updateSources(["app|foo.txt"]);
     expectAllAssetsShouldFail(isAggregateException([
@@ -79,13 +97,11 @@ main() {
   });
 
   // Regression test.
-  test("getAllAssets() is called synchronously after after initializing "
+  test(
+      "getAllAssets() is called synchronously after after initializing "
       "barback", () {
-    var provider = new MockProvider({
-      "app|a.txt": "a",
-      "app|b.txt": "b",
-      "app|c.txt": "c"
-    });
+    var provider = new MockProvider(
+        {"app|a.txt": "a", "app|b.txt": "b", "app|c.txt": "c"});
     var barback = new Barback(provider);
     barback.updateSources([
       new AssetId.parse("app|a.txt"),
@@ -93,8 +109,10 @@ main() {
       new AssetId.parse("app|c.txt")
     ]);
 
-    expect(barback.getAllAssets().then((assets) {
-      return Future.wait(assets.map((asset) => asset.readAsString()));
-    }), completion(unorderedEquals(["a", "b", "c"])));
+    expect(
+        barback.getAllAssets().then((assets) {
+          return Future.wait(assets.map((asset) => asset.readAsString()));
+        }),
+        completion(unorderedEquals(["a", "b", "c"])));
   });
 }

@@ -22,11 +22,12 @@ class DeclareAssetsTransformer extends MockTransformer
   /// If this is non-`null`, assets are only declared for this input.
   final AssetId input;
 
-  DeclareAssetsTransformer(Iterable<String> declared, {Iterable<String> emitted,
-        String input})
+  DeclareAssetsTransformer(Iterable<String> declared,
+      {Iterable<String> emitted, String input})
       : this.declared = declared.map((id) => new AssetId.parse(id)).toList(),
         this.emitted = (emitted == null ? declared : emitted)
-            .map((id) => new AssetId.parse(id)).toList(),
+            .map((id) => new AssetId.parse(id))
+            .toList(),
         this.input = input == null ? null : new AssetId.parse(input);
 
   bool doIsPrimary(AssetId id) => input == null || id == input;

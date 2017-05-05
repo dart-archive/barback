@@ -21,9 +21,11 @@ main() {
       "app|dir/subdir/zap.png"
     ];
 
-    initGraph(sources, {"app": [
-      [new AggregateManyToOneTransformer("txt", "out.txt")]
-    ]});
+    initGraph(sources, {
+      "app": [
+        [new AggregateManyToOneTransformer("txt", "out.txt")]
+      ]
+    });
 
     updateSources(sources);
     expectAsset("app|dir/out.txt", "bar\nfoo");
@@ -33,9 +35,14 @@ main() {
 
   test("an aggregate transformer isn't run if there are no primary inputs", () {
     var transformer = new AggregateManyToOneTransformer("txt", "out.txt");
-    initGraph(["app|foo.zip", "app|bar.zap"], {"app": [
-      [transformer]
-    ]});
+    initGraph([
+      "app|foo.zip",
+      "app|bar.zap"
+    ], {
+      "app": [
+        [transformer]
+      ]
+    });
 
     updateSources(["app|foo.zip", "app|bar.zap"]);
     expectNoAsset("app|out.txt");
@@ -45,9 +52,14 @@ main() {
   });
 
   test("an aggregate transformer is re-run if a primary input changes", () {
-    initGraph(["app|foo.txt", "app|bar.txt"], {"app": [
-      [new AggregateManyToOneTransformer("txt", "out.txt")]
-    ]});
+    initGraph([
+      "app|foo.txt",
+      "app|bar.txt"
+    ], {
+      "app": [
+        [new AggregateManyToOneTransformer("txt", "out.txt")]
+      ]
+    });
 
     updateSources(["app|foo.txt", "app|bar.txt"]);
     expectAsset("app|out.txt", "bar\nfoo");
@@ -60,9 +72,14 @@ main() {
   });
 
   test("an aggregate transformer is re-run if a primary input is removed", () {
-    initGraph(["app|foo.txt", "app|bar.txt"], {"app": [
-      [new AggregateManyToOneTransformer("txt", "out.txt")]
-    ]});
+    initGraph([
+      "app|foo.txt",
+      "app|bar.txt"
+    ], {
+      "app": [
+        [new AggregateManyToOneTransformer("txt", "out.txt")]
+      ]
+    });
 
     updateSources(["app|foo.txt", "app|bar.txt"]);
     expectAsset("app|out.txt", "bar\nfoo");
@@ -74,9 +91,15 @@ main() {
   });
 
   test("an aggregate transformer is re-run if a primary input is added", () {
-    initGraph(["app|foo.txt", "app|bar.txt", "app|baz.txt"], {"app": [
-      [new AggregateManyToOneTransformer("txt", "out.txt")]
-    ]});
+    initGraph([
+      "app|foo.txt",
+      "app|bar.txt",
+      "app|baz.txt"
+    ], {
+      "app": [
+        [new AggregateManyToOneTransformer("txt", "out.txt")]
+      ]
+    });
 
     updateSources(["app|foo.txt", "app|bar.txt"]);
     expectAsset("app|out.txt", "bar\nfoo");
@@ -87,11 +110,17 @@ main() {
     buildShouldSucceed();
   });
 
-  test("an aggregate transformer ceases to run if all primary inputs are "
+  test(
+      "an aggregate transformer ceases to run if all primary inputs are "
       "removed", () {
-    initGraph(["app|foo.txt", "app|bar.txt"], {"app": [
-      [new AggregateManyToOneTransformer("txt", "out.txt")]
-    ]});
+    initGraph([
+      "app|foo.txt",
+      "app|bar.txt"
+    ], {
+      "app": [
+        [new AggregateManyToOneTransformer("txt", "out.txt")]
+      ]
+    });
 
     updateSources(["app|foo.txt", "app|bar.txt"]);
     expectAsset("app|out.txt", "bar\nfoo");
@@ -102,11 +131,17 @@ main() {
     buildShouldSucceed();
   });
 
-  test("an aggregate transformer starts to run if new primary inputs are "
+  test(
+      "an aggregate transformer starts to run if new primary inputs are "
       "added", () {
-    initGraph(["app|foo.txt", "app|bar.txt"], {"app": [
-      [new AggregateManyToOneTransformer("txt", "out.txt")]
-    ]});
+    initGraph([
+      "app|foo.txt",
+      "app|bar.txt"
+    ], {
+      "app": [
+        [new AggregateManyToOneTransformer("txt", "out.txt")]
+      ]
+    });
 
     updateSources([]);
     expectNoAsset("app|out.txt");
@@ -118,11 +153,17 @@ main() {
   });
 
   group("pass-through", () {
-    test("an aggregate transformer passes through its primary inputs by "
+    test(
+        "an aggregate transformer passes through its primary inputs by "
         "default", () {
-      initGraph(["app|foo.txt", "app|bar.txt"], {"app": [
-        [new AggregateManyToOneTransformer("txt", "out.txt")]
-      ]});
+      initGraph([
+        "app|foo.txt",
+        "app|bar.txt"
+      ], {
+        "app": [
+          [new AggregateManyToOneTransformer("txt", "out.txt")]
+        ]
+      });
 
       updateSources(["app|foo.txt", "app|bar.txt"]);
       expectAsset("app|foo.txt", "foo");
@@ -136,9 +177,14 @@ main() {
     });
 
     test("an aggregate transformer can overwrite its primary inputs", () {
-      initGraph(["app|foo.txt", "app|bar.txt"], {"app": [
-        [new AggregateManyToManyTransformer("txt")]
-      ]});
+      initGraph([
+        "app|foo.txt",
+        "app|bar.txt"
+      ], {
+        "app": [
+          [new AggregateManyToManyTransformer("txt")]
+        ]
+      });
 
       updateSources(["app|foo.txt", "app|bar.txt"]);
       expectAsset("app|foo.txt", "modified foo");
@@ -148,11 +194,16 @@ main() {
 
     test("an aggregate transformer can consume its primary inputs", () {
       var transformer = new AggregateManyToOneTransformer("txt", "out.txt");
-      transformer.consumePrimaries
-          ..add("app|foo.txt")
-          ..add("app|bar.txt");
+      transformer.consumePrimaries..add("app|foo.txt")..add("app|bar.txt");
 
-      initGraph(["app|foo.txt", "app|bar.txt"], {"app": [[transformer]]});
+      initGraph([
+        "app|foo.txt",
+        "app|bar.txt"
+      ], {
+        "app": [
+          [transformer]
+        ]
+      });
 
       updateSources(["app|foo.txt", "app|bar.txt"]);
       expectNoAsset("app|foo.txt");
@@ -161,9 +212,14 @@ main() {
     });
 
     test("an aggregate transformer passes through non-primary inputs", () {
-      initGraph(["app|foo.jpg", "app|bar.png"], {"app": [
-        [new AggregateManyToManyTransformer("txt")]
-      ]});
+      initGraph([
+        "app|foo.jpg",
+        "app|bar.png"
+      ], {
+        "app": [
+          [new AggregateManyToManyTransformer("txt")]
+        ]
+      });
 
       updateSources(["app|foo.jpg", "app|bar.png"]);
       expectAsset("app|foo.jpg", "foo");
@@ -178,13 +234,19 @@ main() {
   });
 
   group("apply() transform stream", () {
-    test("the primary input stream doesn't close if a previous phase is still "
+    test(
+        "the primary input stream doesn't close if a previous phase is still "
         "running", () {
       var rewrite = new RewriteTransformer("a", "b");
-      initGraph(["app|foo.txt", "app|bar.a"], {"app": [
-        [rewrite],
-        [new AggregateManyToOneTransformer("txt", "out.txt")]
-      ]});
+      initGraph([
+        "app|foo.txt",
+        "app|bar.a"
+      ], {
+        "app": [
+          [rewrite],
+          [new AggregateManyToOneTransformer("txt", "out.txt")]
+        ]
+      });
 
       rewrite.pauseApply();
       updateSources(["app|foo.txt", "app|bar.a"]);
@@ -195,13 +257,19 @@ main() {
       buildShouldSucceed();
     });
 
-    test("the primary input stream doesn't close if a previous phase is "
+    test(
+        "the primary input stream doesn't close if a previous phase is "
         "materializing a primary input", () {
       var rewrite = new DeclaringRewriteTransformer("in", "txt");
-      initGraph(["app|foo.txt", "app|bar.in"], {"app": [
-        [rewrite],
-        [new AggregateManyToOneTransformer("txt", "out.txt")]
-      ]});
+      initGraph([
+        "app|foo.txt",
+        "app|bar.in"
+      ], {
+        "app": [
+          [rewrite],
+          [new AggregateManyToOneTransformer("txt", "out.txt")]
+        ]
+      });
 
       rewrite.pauseApply();
       updateSources(["app|foo.txt", "app|bar.in"]);
@@ -212,13 +280,19 @@ main() {
       buildShouldSucceed();
     });
 
-    test("the primary input stream closes if a previous phase is only "
+    test(
+        "the primary input stream closes if a previous phase is only "
         "materializing non-primary inputs", () {
       var rewrite = new DeclaringRewriteTransformer("a", "b");
-      initGraph(["app|foo.txt", "app|bar.a"], {"app": [
-        [rewrite],
-        [new AggregateManyToOneTransformer("txt", "out.txt")]
-      ]});
+      initGraph([
+        "app|foo.txt",
+        "app|bar.a"
+      ], {
+        "app": [
+          [rewrite],
+          [new AggregateManyToOneTransformer("txt", "out.txt")]
+        ]
+      });
 
       rewrite.pauseApply();
       updateSources(["app|foo.txt", "app|bar.a"]);
@@ -228,14 +302,21 @@ main() {
       buildShouldSucceed();
     });
 
-    test("a new primary input that arrives before the stream closes doesn't "
+    test(
+        "a new primary input that arrives before the stream closes doesn't "
         "cause apply to restart", () {
       var rewrite = new RewriteTransformer("a", "b");
       var aggregate = new AggregateManyToOneTransformer("txt", "out.txt");
-      initGraph(["app|foo.txt", "app|bar.txt", "app|baz.a"], {"app": [
-        [rewrite],
-        [aggregate]
-      ]});
+      initGraph([
+        "app|foo.txt",
+        "app|bar.txt",
+        "app|baz.a"
+      ], {
+        "app": [
+          [rewrite],
+          [aggregate]
+        ]
+      });
 
       // The stream won't close until [rewrite] finishes running `apply()`.
       rewrite.pauseApply();
@@ -253,10 +334,18 @@ main() {
       expect(aggregate.numRuns, completion(equals(1)));
     });
 
-    test("a new primary input that arrives after the stream closes causes "
+    test(
+        "a new primary input that arrives after the stream closes causes "
         "apply to restart", () {
       var aggregate = new AggregateManyToOneTransformer("txt", "out.txt");
-      initGraph(["app|foo.txt", "app|bar.txt"], {"app": [[aggregate]]});
+      initGraph([
+        "app|foo.txt",
+        "app|bar.txt"
+      ], {
+        "app": [
+          [aggregate]
+        ]
+      });
 
       aggregate.pauseApply();
       updateSources(["app|foo.txt"]);
@@ -272,14 +361,20 @@ main() {
       expect(aggregate.numRuns, completion(equals(2)));
     });
 
-    test("a primary input that's modified before the stream closes causes "
+    test(
+        "a primary input that's modified before the stream closes causes "
         "apply to restart", () {
       var rewrite = new RewriteTransformer("a", "b");
       var aggregate = new AggregateManyToOneTransformer("txt", "out.txt");
-      initGraph(["app|foo.txt", "app|bar.a"], {"app": [
-        [rewrite],
-        [aggregate]
-      ]});
+      initGraph([
+        "app|foo.txt",
+        "app|bar.a"
+      ], {
+        "app": [
+          [rewrite],
+          [aggregate]
+        ]
+      });
 
       // The stream won't close until [rewrite] finishes running `apply()`.
       rewrite.pauseApply();
@@ -298,14 +393,21 @@ main() {
       expect(aggregate.numRuns, completion(equals(2)));
     });
 
-    test("a primary input that's removed before the stream closes causes apply "
+    test(
+        "a primary input that's removed before the stream closes causes apply "
         "to restart", () {
       var rewrite = new RewriteTransformer("a", "b");
       var aggregate = new AggregateManyToOneTransformer("txt", "out.txt");
-      initGraph(["app|foo.txt", "app|bar.txt", "app|baz.a"], {"app": [
-        [rewrite],
-        [aggregate]
-      ]});
+      initGraph([
+        "app|foo.txt",
+        "app|bar.txt",
+        "app|baz.a"
+      ], {
+        "app": [
+          [rewrite],
+          [aggregate]
+        ]
+      });
 
       // The stream won't close until [rewrite] finishes running `apply()`.
       rewrite.pauseApply();

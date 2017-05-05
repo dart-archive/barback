@@ -29,10 +29,18 @@ class LogTransformer extends MockTransformer {
       var parts = entry.split(":");
       var logFn;
       switch (parts[0]) {
-        case "error":   logFn = transform.logger.error; break;
-        case "warning": logFn = transform.logger.warning; break;
-        case "info":    logFn = transform.logger.info; break;
-        case "fine":    logFn = transform.logger.fine; break;
+        case "error":
+          logFn = transform.logger.error;
+          break;
+        case "warning":
+          logFn = transform.logger.warning;
+          break;
+        case "info":
+          logFn = transform.logger.info;
+          break;
+        case "fine":
+          logFn = transform.logger.fine;
+          break;
       }
 
       logFn(parts[1].trim());

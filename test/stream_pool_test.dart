@@ -50,18 +50,21 @@ main() {
       controller1.add("fifth");
 
       expect(newFuture(() {
-        return pool.stream.transform(new StreamTransformer.fromHandlers(
-            handleData: (data, sink) => sink.add(["data", data]),
-            handleError: (error, stackTrace, sink) {
-          sink.add(["error", error]);
-        })).toList();
-      }), completion(equals([
-        ["data", "first"],
-        ["data", "second"],
-        ["error", "third"],
-        ["error", "fourth"],
-        ["data", "fifth"]
-      ])));
+        return pool.stream
+            .transform(new StreamTransformer.fromHandlers(
+                handleData: (data, sink) => sink.add(["data", data]),
+                handleError: (error, stackTrace, sink) {
+                  sink.add(["error", error]);
+                }))
+            .toList();
+      }),
+          completion(equals([
+            ["data", "first"],
+            ["data", "second"],
+            ["error", "third"],
+            ["error", "fourth"],
+            ["data", "fifth"]
+          ])));
 
       pumpEventQueue().then((_) => pool.close());
     });
@@ -113,9 +116,12 @@ main() {
       controller2.addError("second");
 
       expect(newFuture(() {
-        return pool.stream.transform(new StreamTransformer.fromHandlers(
-            handleData: (data, sink) => sink.add(data),
-            handleError: (error, stackTrace, sink) { sink.add(error); }))
+        return pool.stream
+            .transform(new StreamTransformer.fromHandlers(
+                handleData: (data, sink) => sink.add(data),
+                handleError: (error, stackTrace, sink) {
+                  sink.add(error);
+                }))
             .toList();
       }), completion(isEmpty));
 
@@ -163,7 +169,7 @@ main() {
         pool.add(broadcastController.stream);
 
         broadcastSyncController =
-          new StreamController<String>.broadcast(sync: true);
+            new StreamController<String>.broadcast(sync: true);
         pool.add(broadcastSyncController.stream);
       });
 
@@ -202,17 +208,19 @@ main() {
         expect(pool.stream.toList(), completion(equals(["first", "third"])));
 
         bufferedController.add("first");
-        expect(pumpEventQueue().then((_) {
-          pool.remove(bufferedController.stream);
-          bufferedController.add("second");
-        }).then((_) {
-          broadcastController.add("third");
-          return pumpEventQueue();
-        }).then((_) {
-          pool.remove(broadcastController.stream);
-          broadcastController.add("fourth");
-          pool.close();
-        }), completes);
+        expect(
+            pumpEventQueue().then((_) {
+              pool.remove(bufferedController.stream);
+              bufferedController.add("second");
+            }).then((_) {
+              broadcastController.add("third");
+              return pumpEventQueue();
+            }).then((_) {
+              pool.remove(broadcastController.stream);
+              broadcastController.add("fourth");
+              pool.close();
+            }),
+            completes);
       });
     });
   }

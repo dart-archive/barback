@@ -28,24 +28,32 @@ main() {
   });
 
   test("reports an error for an unprovided source", () {
-    initGraph(["app|known.txt"], {"app": [
-      // Have a dummy transformer so that barback at least tries to load the
-      // asset.
-      [new RewriteTransformer("a", "b")]
-    ]});
+    initGraph([
+      "app|known.txt"
+    ], {
+      "app": [
+        // Have a dummy transformer so that barback at least tries to load the
+        // asset.
+        [new RewriteTransformer("a", "b")]
+      ]
+    });
 
     updateSources(["app|unknown.txt"]);
 
     buildShouldFail([
-      isAssetLoadException("app|unknown.txt",
-          isAssetNotFoundException("app|unknown.txt"))
+      isAssetLoadException(
+          "app|unknown.txt", isAssetNotFoundException("app|unknown.txt"))
     ]);
   });
 
   test("reports missing input errors in results", () {
-    initGraph({"app|a.txt": "a.inc"}, {"app": [
-      [new ManyToOneTransformer("txt")]
-    ]});
+    initGraph({
+      "app|a.txt": "a.inc"
+    }, {
+      "app": [
+        [new ManyToOneTransformer("txt")]
+      ]
+    });
 
     updateSources(["app|a.txt"]);
     expectNoAsset("app|a.out");
@@ -54,8 +62,12 @@ main() {
 
   test("reports an error if a transformer emits an asset for another package",
       () {
-    initGraph(["app|foo.txt"], {
-      "app": [[new CreateAssetTransformer("wrong|foo.txt")]]
+    initGraph([
+      "app|foo.txt"
+    ], {
+      "app": [
+        [new CreateAssetTransformer("wrong|foo.txt")]
+      ]
     });
 
     updateSources(["app|foo.txt"]);
@@ -68,9 +80,11 @@ main() {
       "app|a.inc": "a",
       "app|b.inc": "b",
       "app|c.inc": "c"
-    }, {"app": [
-      [new ManyToOneTransformer("txt")]
-    ]});
+    }, {
+      "app": [
+        [new ManyToOneTransformer("txt")]
+      ]
+    });
 
     updateSources(["app|a.txt", "app|a.inc", "app|b.inc", "app|c.inc"]);
     expectAsset("app|a.out", "abc");
@@ -82,9 +96,15 @@ main() {
   });
 
   test("catches transformer exceptions and reports them", () {
-    initGraph(["app|foo.txt"], {"app": [
-      [new BadTransformer(["app|foo.out"])]
-    ]});
+    initGraph([
+      "app|foo.txt"
+    ], {
+      "app": [
+        [
+          new BadTransformer(["app|foo.out"])
+        ]
+      ]
+    });
 
     updateSources(["app|foo.txt"]);
     expectNoAsset("app|foo.out");
@@ -92,7 +112,13 @@ main() {
   });
 
   test("catches errors even if nothing is waiting for process results", () {
-    initGraph(["app|foo.txt"], {"app": [[new BadTransformer([])]]});
+    initGraph([
+      "app|foo.txt"
+    ], {
+      "app": [
+        [new BadTransformer([])]
+      ]
+    });
 
     updateSources(["app|foo.txt"]);
     // Note: No asset requests here.
@@ -100,17 +126,29 @@ main() {
   });
 
   test("discards outputs from failed transforms", () {
-    initGraph(["app|foo.txt"], {"app": [
-      [new BadTransformer(["a.out", "b.out"])]
-    ]});
+    initGraph([
+      "app|foo.txt"
+    ], {
+      "app": [
+        [
+          new BadTransformer(["a.out", "b.out"])
+        ]
+      ]
+    });
 
     updateSources(["app|foo.txt"]);
     expectNoAsset("app|a.out");
   });
 
   test("fails if only one package fails", () {
-    initGraph(["pkg1|foo.txt", "pkg2|foo.txt"],
-        {"pkg1": [[new BadTransformer([])]]});
+    initGraph([
+      "pkg1|foo.txt",
+      "pkg2|foo.txt"
+    ], {
+      "pkg1": [
+        [new BadTransformer([])]
+      ]
+    });
 
     updateSources(["pkg1|foo.txt", "pkg2|foo.txt"]);
     expectAsset("pkg2|foo.txt", "foo");
@@ -118,9 +156,16 @@ main() {
   });
 
   test("emits multiple failures if multiple packages fail", () {
-    initGraph(["pkg1|foo.txt", "pkg2|foo.txt"], {
-      "pkg1": [[new BadTransformer([])]],
-      "pkg2": [[new BadTransformer([])]]
+    initGraph([
+      "pkg1|foo.txt",
+      "pkg2|foo.txt"
+    ], {
+      "pkg1": [
+        [new BadTransformer([])]
+      ],
+      "pkg2": [
+        [new BadTransformer([])]
+      ]
     });
 
     updateSources(["pkg1|foo.txt", "pkg2|foo.txt"]);
@@ -131,11 +176,15 @@ main() {
   });
 
   test("an error loading an asset removes the asset from the graph", () {
-    initGraph(["app|foo.txt"], {"app": [
-      // Have a dummy transformer so that barback at least tries to load the
-      // asset.
-      [new RewriteTransformer("a", "b")]
-    ]});
+    initGraph([
+      "app|foo.txt"
+    ], {
+      "app": [
+        // Have a dummy transformer so that barback at least tries to load the
+        // asset.
+        [new RewriteTransformer("a", "b")]
+      ]
+    });
 
     setAssetError("app|foo.txt");
     updateSources(["app|foo.txt"]);
@@ -147,11 +196,15 @@ main() {
 
   test("a synchronous error loading an asset removes the asset from the graph",
       () {
-    initGraph(["app|foo.txt"], {"app": [
-      // Have a dummy transformer so that barback at least tries to load the
-      // asset.
-      [new RewriteTransformer("a", "b")]
-    ]});
+    initGraph([
+      "app|foo.txt"
+    ], {
+      "app": [
+        // Have a dummy transformer so that barback at least tries to load the
+        // asset.
+        [new RewriteTransformer("a", "b")]
+      ]
+    });
 
     setAssetError("app|foo.txt", async: false);
     updateSources(["app|foo.txt"]);
@@ -162,7 +215,13 @@ main() {
   });
 
   test("an asset isn't passed through a transformer with an error", () {
-    initGraph(["app|foo.txt"], {"app": [[new BadTransformer([])]]});
+    initGraph([
+      "app|foo.txt"
+    ], {
+      "app": [
+        [new BadTransformer([])]
+      ]
+    });
 
     updateSources(["app|foo.txt"]);
     expectNoAsset("app|foo.txt");
@@ -170,9 +229,15 @@ main() {
   });
 
   test("a transformer that logs errors shouldn't produce output", () {
-    initGraph(["app|foo.txt"], {"app": [
-      [new BadLogTransformer(["app|out.txt"])]
-    ]});
+    initGraph([
+      "app|foo.txt"
+    ], {
+      "app": [
+        [
+          new BadLogTransformer(["app|out.txt"])
+        ]
+      ]
+    });
 
     updateSources(["app|foo.txt"]);
     expectNoAsset("app|foo.txt");
@@ -184,23 +249,30 @@ main() {
   });
 
   test("a transformer can catch an error loading a secondary input", () {
-    initGraph(["app|foo.txt"], {"app": [
-      [new CatchAssetNotFoundTransformer(".txt", "app|nothing")]
-    ]});
+    initGraph([
+      "app|foo.txt"
+    ], {
+      "app": [
+        [new CatchAssetNotFoundTransformer(".txt", "app|nothing")]
+      ]
+    });
 
     updateSources(["app|foo.txt"]);
     expectAsset("app|foo.txt", "failed to load app|nothing");
     buildShouldSucceed();
   });
 
-  test("a transformer that fails due to a missing secondary input is re-run "
+  test(
+      "a transformer that fails due to a missing secondary input is re-run "
       "when that input appears", () {
     initGraph({
       "app|foo.txt": "bar.inc",
       "app|bar.inc": "bar"
-    }, {"app": [
-      [new ManyToOneTransformer("txt")]
-    ]});
+    }, {
+      "app": [
+        [new ManyToOneTransformer("txt")]
+      ]
+    });
 
     updateSources(["app|foo.txt"]);
     expectNoAsset("app|foo.out");

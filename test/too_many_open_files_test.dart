@@ -49,7 +49,9 @@ runOnManyFiles(Future assetHandler(Asset asset)) {
     futures.add(assetHandler(asset));
   }
 
-  expect(Future.wait(futures).whenComplete(() {
-    new Directory(tempDir).delete(recursive: true);
-  }), completes);
+  expect(
+      Future.wait(futures).whenComplete(() {
+        new Directory(tempDir).delete(recursive: true);
+      }),
+      completes);
 }
