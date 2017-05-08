@@ -4,7 +4,6 @@
 
 library barback.test.package_graph.transform_test;
 
-import 'package:barback/src/utils.dart';
 import 'package:scheduled_test/scheduled_test.dart';
 
 import '../utils.dart';

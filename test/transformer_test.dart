@@ -7,7 +7,6 @@ library barback.test.transformer_test;
 import 'dart:async';
 
 import 'package:barback/barback.dart';
-import 'package:barback/src/utils.dart';
 import 'package:unittest/unittest.dart';
 
 import 'utils.dart';

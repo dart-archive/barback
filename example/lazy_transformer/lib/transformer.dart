@@ -15,6 +15,7 @@ class CodedMessageConverter extends Transformer implements LazyTransformer {
 
   Future declareOutputs(DeclaringTransform transform) {
     transform.declareOutput(transform.primaryId.changeExtension('.shhhhh'));
+    return new Future.value(() {});
   }
 
   Future apply(Transform transform) async {

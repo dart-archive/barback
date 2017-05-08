@@ -86,7 +86,7 @@ main() {
     var controller = new StreamController<int>(onListen: () {
       isOpened = true;
     });
-    var replayer = new StreamReplayer<int>(controller.stream);
+    new StreamReplayer<int>(controller.stream);
 
     expect(pumpEventQueue().then((_) => isOpened), completion(isFalse));
   });
