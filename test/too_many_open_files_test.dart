@@ -43,7 +43,7 @@ runOnManyFiles(Future assetHandler(Asset asset)) {
 
   // Create a large number of assets, larger than the file descriptor limit
   // of most machines and start reading from all of them.
-  var futures = [];
+  var futures = <Future>[];
   for (var i = 0; i < 1000; i++) {
     var asset = new Asset.fromPath(id, filePath);
     futures.add(assetHandler(asset));
