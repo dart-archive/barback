@@ -4,8 +4,6 @@
 
 library barback.test.package_graph.group_test;
 
-import 'dart:async';
-
 import 'package:barback/barback.dart';
 import 'package:scheduled_test/scheduled_test.dart';
 

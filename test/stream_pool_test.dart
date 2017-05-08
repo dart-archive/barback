@@ -146,10 +146,8 @@ main() {
     group(type, () {
       var pool;
       var bufferedController;
-      var bufferedStream;
       var bufferedSyncController;
       var broadcastController;
-      var broadcastStream;
       var broadcastSyncController;
 
       setUp(() {

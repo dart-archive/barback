@@ -49,7 +49,7 @@ abstract class MockTransformer extends Transformer {
   ///
   /// Once this transformer finishes running, this is reset to a new completer,
   /// so it can be used multiple times.
-  var _started = new Completer();
+  var _started = new Completer<Null>();
 
   /// `true` if any transforms are currently running.
   ///

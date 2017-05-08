@@ -4,10 +4,7 @@
 
 library barback.test.transformer.log;
 
-import 'dart:async';
-
 import 'package:barback/barback.dart';
-import 'package:barback/src/utils.dart';
 
 import 'mock.dart';
 

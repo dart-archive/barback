@@ -49,7 +49,7 @@ class TransformerClassifier {
   /// classifying all available inputs.
   Stream get onDoneClassifying => _onDoneClassifyingController.stream;
   final _onDoneClassifyingController =
-      new StreamController.broadcast(sync: true);
+      new StreamController<Null>.broadcast(sync: true);
 
   /// The number of currently-active calls to [transformer.classifyPrimary].
   ///
