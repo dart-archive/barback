@@ -83,8 +83,7 @@ void initConfig() {
 ///
 /// [transformers] is a map from package names to the transformers for each
 /// package.
-void initGraph(
-        [assets, Map<String, Iterable<Iterable<Transformer>>> transformers]) =>
+void initGraph([assets, Map<String, Iterable<Iterable>> transformers]) =>
     initStaticGraph(assets, transformers: transformers);
 
 void initStaticGraph(assets,
