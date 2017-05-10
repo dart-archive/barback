@@ -17,7 +17,7 @@ class DeclaringAggregateManyToOneTransformer
       : super(extension, output);
 
   void declareOutputs(DeclaringAggregateTransform transform) {
-    transform.declareOutput(new AssetId(transform.package,
-        path.url.join(transform.key, output)));
+    transform.declareOutput(
+        new AssetId(transform.package, path.url.join(transform.key, output)));
   }
 }

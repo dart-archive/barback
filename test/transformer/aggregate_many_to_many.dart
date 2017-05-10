@@ -27,8 +27,8 @@ class AggregateManyToManyTransformer extends MockAggregateTransformer {
   Future doApply(AggregateTransform transform) {
     return getPrimaryInputs(transform).asyncMap((asset) {
       return asset.readAsString().then((contents) {
-        transform.addOutput(new Asset.fromString(
-            asset.id, "modified $contents"));
+        transform
+            .addOutput(new Asset.fromString(asset.id, "modified $contents"));
       });
     }).toList();
   }

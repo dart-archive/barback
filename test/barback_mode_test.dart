@@ -12,9 +12,12 @@ import 'utils.dart';
 main() {
   initConfig();
   test("constructor uses canonical instances for DEBUG and RELEASE", () {
-    expect(identical(BarbackMode.DEBUG,
-        new BarbackMode(BarbackMode.DEBUG.name)), isTrue);
-    expect(identical(BarbackMode.RELEASE,
-        new BarbackMode(BarbackMode.RELEASE.name)), isTrue);
+    expect(
+        identical(BarbackMode.DEBUG, new BarbackMode(BarbackMode.DEBUG.name)),
+        isTrue);
+    expect(
+        identical(
+            BarbackMode.RELEASE, new BarbackMode(BarbackMode.RELEASE.name)),
+        isTrue);
   });
 }

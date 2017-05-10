@@ -16,7 +16,13 @@ main() {
   test("runs transforms in the same phase in parallel", () {
     var transformerA = new RewriteTransformer("txt", "a");
     var transformerB = new RewriteTransformer("txt", "b");
-    initGraph(["app|foo.txt"], {"app": [[transformerA, transformerB]]});
+    initGraph([
+      "app|foo.txt"
+    ], {
+      "app": [
+        [transformerA, transformerB]
+      ]
+    });
 
     transformerA.pauseApply();
     transformerB.pauseApply();
@@ -38,10 +44,17 @@ main() {
     buildShouldSucceed();
   });
 
-  test("discards outputs from a transform whose primary input is removed "
+  test(
+      "discards outputs from a transform whose primary input is removed "
       "during processing", () {
     var rewrite = new RewriteTransformer("txt", "out");
-    initGraph(["app|foo.txt"], {"app": [[rewrite]]});
+    initGraph([
+      "app|foo.txt"
+    ], {
+      "app": [
+        [rewrite]
+      ]
+    });
 
     rewrite.pauseApply();
     updateSources(["app|foo.txt"]);
@@ -59,7 +72,11 @@ main() {
     var check2 = new CheckContentTransformer("second", "#2");
     initGraph({
       "app|foo.txt": "first",
-    }, {"app": [[check1, check2]]});
+    }, {
+      "app": [
+        [check1, check2]
+      ]
+    });
 
     check1.pauseIsPrimary("app|foo.txt");
     updateSources(["app|foo.txt"]);
@@ -74,13 +91,18 @@ main() {
     buildShouldSucceed();
   });
 
-  test("applies the correct transform if an asset is removed and added during "
+  test(
+      "applies the correct transform if an asset is removed and added during "
       "isPrimary", () {
     var check1 = new CheckContentTransformer("first", "#1");
     var check2 = new CheckContentTransformer("second", "#2");
     initGraph({
       "app|foo.txt": "first",
-    }, {"app": [[check1, check2]]});
+    }, {
+      "app": [
+        [check1, check2]
+      ]
+    });
 
     check1.pauseIsPrimary("app|foo.txt");
     updateSources(["app|foo.txt"]);
@@ -98,7 +120,13 @@ main() {
 
   test("restarts processing if a change occurs during processing", () {
     var transformer = new RewriteTransformer("txt", "out");
-    initGraph(["app|foo.txt"], {"app": [[transformer]]});
+    initGraph([
+      "app|foo.txt"
+    ], {
+      "app": [
+        [transformer]
+      ]
+    });
 
     transformer.pauseApply();
 
@@ -118,7 +146,13 @@ main() {
   test("aborts processing if the primary input is removed during processing",
       () {
     var transformer = new RewriteTransformer("txt", "out");
-    initGraph(["app|foo.txt"], {"app": [[transformer]]});
+    initGraph([
+      "app|foo.txt"
+    ], {
+      "app": [
+        [transformer]
+      ]
+    });
 
     transformer.pauseApply();
 
@@ -135,13 +169,18 @@ main() {
     expect(transformer.numRuns, completion(equals(1)));
   });
 
-  test("restarts processing if a change to a new secondary input occurs during "
+  test(
+      "restarts processing if a change to a new secondary input occurs during "
       "processing", () {
     var transformer = new ManyToOneTransformer("txt");
     initGraph({
       "app|foo.txt": "bar.inc",
       "app|bar.inc": "bar"
-    }, {"app": [[transformer]]});
+    }, {
+      "app": [
+        [transformer]
+      ]
+    });
 
     transformer.pauseApply();
 
@@ -166,14 +205,19 @@ main() {
     expect(transformer.numRuns, completion(equals(2)));
   });
 
-  test("doesn't restart processing if a change to an old secondary input "
+  test(
+      "doesn't restart processing if a change to an old secondary input "
       "occurs during processing", () {
     var transformer = new ManyToOneTransformer("txt");
     initGraph({
       "app|foo.txt": "bar.inc",
       "app|bar.inc": "bar",
       "app|baz.inc": "baz"
-    }, {"app": [[transformer]]});
+    }, {
+      "app": [
+        [transformer]
+      ]
+    });
 
     updateSources(["app|foo.txt", "app|bar.inc", "app|baz.inc"]);
     expectAsset("app|foo.out", "bar");
@@ -203,8 +247,15 @@ main() {
   test("restarts before finishing later phases when a change occurs", () {
     var txtToInt = new RewriteTransformer("txt", "int");
     var intToOut = new RewriteTransformer("int", "out");
-    initGraph(["app|foo.txt", "app|bar.txt"],
-        {"app": [[txtToInt], [intToOut]]});
+    initGraph([
+      "app|foo.txt",
+      "app|bar.txt"
+    ], {
+      "app": [
+        [txtToInt],
+        [intToOut]
+      ]
+    });
 
     txtToInt.pauseApply();
 
@@ -225,10 +276,14 @@ main() {
   });
 
   test("doesn't return an asset until it's finished rebuilding", () {
-    initGraph(["app|foo.in"], {"app": [
-      [new RewriteTransformer("in", "mid")],
-      [new RewriteTransformer("mid", "out")]
-    ]});
+    initGraph([
+      "app|foo.in"
+    ], {
+      "app": [
+        [new RewriteTransformer("in", "mid")],
+        [new RewriteTransformer("mid", "out")]
+      ]
+    });
 
     updateSources(["app|foo.in"]);
     expectAsset("app|foo.out", "foo.mid.out");
@@ -247,7 +302,13 @@ main() {
 
   test("doesn't return an asset until its in-place transform is done", () {
     var rewrite = new RewriteTransformer("txt", "txt");
-    initGraph(["app|foo.txt"], {"app": [[rewrite]]});
+    initGraph([
+      "app|foo.txt"
+    ], {
+      "app": [
+        [rewrite]
+      ]
+    });
 
     rewrite.pauseApply();
     updateSources(["app|foo.txt"]);
@@ -260,7 +321,13 @@ main() {
 
   test("doesn't return an asset that's removed during isPrimary", () {
     var rewrite = new RewriteTransformer("txt", "txt");
-    initGraph(["app|foo.txt"], {"app": [[rewrite]]});
+    initGraph([
+      "app|foo.txt"
+    ], {
+      "app": [
+        [rewrite]
+      ]
+    });
 
     rewrite.pauseIsPrimary("app|foo.txt");
     updateSources(["app|foo.txt"]);
@@ -273,12 +340,17 @@ main() {
     buildShouldSucceed();
   });
 
-  test("doesn't transform an asset that goes from primary to non-primary "
+  test(
+      "doesn't transform an asset that goes from primary to non-primary "
       "during isPrimary", () {
     var check = new CheckContentTransformer(new RegExp(r"^do$"), "ne");
     initGraph({
       "app|foo.txt": "do"
-    }, {"app": [[check]]});
+    }, {
+      "app": [
+        [check]
+      ]
+    });
 
     check.pauseIsPrimary("app|foo.txt");
     updateSources(["app|foo.txt"]);
@@ -293,12 +365,17 @@ main() {
     buildShouldSucceed();
   });
 
-  test("transforms an asset that goes from non-primary to primary "
+  test(
+      "transforms an asset that goes from non-primary to primary "
       "during isPrimary", () {
     var check = new CheckContentTransformer("do", "ne");
     initGraph({
       "app|foo.txt": "don't"
-    }, {"app": [[check]]});
+    }, {
+      "app": [
+        [check]
+      ]
+    });
 
     check.pauseIsPrimary("app|foo.txt");
     updateSources(["app|foo.txt"]);
@@ -313,11 +390,19 @@ main() {
     buildShouldSucceed();
   });
 
-  test("doesn't return an asset that's removed during another transformer's "
+  test(
+      "doesn't return an asset that's removed during another transformer's "
       "isPrimary", () {
     var rewrite1 = new RewriteTransformer("txt", "txt");
     var rewrite2 = new RewriteTransformer("md", "md");
-    initGraph(["app|foo.txt", "app|foo.md"], {"app": [[rewrite1, rewrite2]]});
+    initGraph([
+      "app|foo.txt",
+      "app|foo.md"
+    ], {
+      "app": [
+        [rewrite1, rewrite2]
+      ]
+    });
 
     rewrite2.pauseIsPrimary("app|foo.md");
     updateSources(["app|foo.txt", "app|foo.md"]);
@@ -331,14 +416,19 @@ main() {
     buildShouldSucceed();
   });
 
-  test("doesn't transform an asset that goes from primary to non-primary "
+  test(
+      "doesn't transform an asset that goes from primary to non-primary "
       "during another transformer's isPrimary", () {
     var rewrite = new RewriteTransformer("md", "md");
     var check = new CheckContentTransformer(new RegExp(r"^do$"), "ne");
     initGraph({
       "app|foo.txt": "do",
       "app|foo.md": "foo"
-    }, {"app": [[rewrite, check]]});
+    }, {
+      "app": [
+        [rewrite, check]
+      ]
+    });
 
     rewrite.pauseIsPrimary("app|foo.md");
     updateSources(["app|foo.txt", "app|foo.md"]);
@@ -354,14 +444,19 @@ main() {
     buildShouldSucceed();
   });
 
-  test("transforms an asset that goes from non-primary to primary "
+  test(
+      "transforms an asset that goes from non-primary to primary "
       "during another transformer's isPrimary", () {
     var rewrite = new RewriteTransformer("md", "md");
     var check = new CheckContentTransformer("do", "ne");
     initGraph({
       "app|foo.txt": "don't",
       "app|foo.md": "foo"
-    }, {"app": [[rewrite, check]]});
+    }, {
+      "app": [
+        [rewrite, check]
+      ]
+    });
 
     rewrite.pauseIsPrimary("app|foo.md");
     updateSources(["app|foo.txt", "app|foo.md"]);
@@ -381,7 +476,11 @@ main() {
     initGraph([
       "app|foo.in",
       "app|bar.in",
-    ], {"app": [[new RewriteTransformer("in", "out")]]});
+    ], {
+      "app": [
+        [new RewriteTransformer("in", "out")]
+      ]
+    });
 
     updateSources(["app|foo.in", "app|bar.in"]);
     expectAsset("app|foo.out", "foo.out");
@@ -403,7 +502,11 @@ main() {
   test("doesn't report AssetNotFound until all builds are finished", () {
     initGraph([
       "app|foo.in",
-    ], {"app": [[new RewriteTransformer("in", "out")]]});
+    ], {
+      "app": [
+        [new RewriteTransformer("in", "out")]
+      ]
+    });
 
     updateSources(["app|foo.in"]);
     expectAsset("app|foo.out", "foo.out");
@@ -426,7 +529,14 @@ main() {
     initGraph([
       "pkg1|foo.txt",
       "pkg2|foo.txt"
-    ], {"pkg1": [[rewrite]], "pkg2": [[rewrite]]});
+    ], {
+      "pkg1": [
+        [rewrite]
+      ],
+      "pkg2": [
+        [rewrite]
+      ]
+    });
 
     // First, run both packages' transformers so both packages are successful.
     updateSources(["pkg1|foo.txt", "pkg2|foo.txt"]);
@@ -447,11 +557,18 @@ main() {
     buildShouldSucceed();
   });
 
-  test("one transformer takes a long time while the other finishes, then "
+  test(
+      "one transformer takes a long time while the other finishes, then "
       "the input is removed", () {
     var rewrite1 = new RewriteTransformer("txt", "out1");
     var rewrite2 = new RewriteTransformer("txt", "out2");
-    initGraph(["app|foo.txt"], {"app": [[rewrite1, rewrite2]]});
+    initGraph([
+      "app|foo.txt"
+    ], {
+      "app": [
+        [rewrite1, rewrite2]
+      ]
+    });
 
     rewrite1.pauseApply();
 
@@ -471,16 +588,19 @@ main() {
     expectNoAsset("app|foo.out2");
   });
 
-  test("a transformer in a later phase gets a slow secondary input from an "
+  test(
+      "a transformer in a later phase gets a slow secondary input from an "
       "earlier phase", () {
     var rewrite = new RewriteTransformer("in", "in");
     initGraph({
       "app|foo.in": "foo",
       "app|bar.txt": "foo.in"
-    }, {"app": [
-      [rewrite],
-      [new ManyToOneTransformer("txt")]
-    ]});
+    }, {
+      "app": [
+        [rewrite],
+        [new ManyToOneTransformer("txt")]
+      ]
+    });
 
     rewrite.pauseApply();
     updateSources(["app|foo.in", "app|bar.txt"]);
@@ -491,11 +611,16 @@ main() {
     buildShouldSucceed();
   });
 
-  test("materializes a passed-through asset that was emitted before it was "
+  test(
+      "materializes a passed-through asset that was emitted before it was "
       "available", () {
-    initGraph(["app|foo.in"], {"app": [
-      [new RewriteTransformer("txt", "txt")]
-    ]});
+    initGraph([
+      "app|foo.in"
+    ], {
+      "app": [
+        [new RewriteTransformer("txt", "txt")]
+      ]
+    });
 
     pauseProvider();
     updateSources(["app|foo.in"]);
@@ -512,10 +637,12 @@ main() {
 
     initGraph([
       "app|foo.txt"
-    ], {"app": [
-      [transformer1],
-      [transformer2]
-    ]});
+    ], {
+      "app": [
+        [transformer1],
+        [transformer2]
+      ]
+    });
 
     transformer2.pausePrimaryInput();
     updateSources(["app|foo.txt"]);
@@ -541,7 +668,8 @@ main() {
   });
 
   // Regression test for issue 19038.
-  test("a secondary input that's marked dirty followed by the primary input "
+  test(
+      "a secondary input that's marked dirty followed by the primary input "
       "being synchronously marked dirty re-runs a transformer", () {
     // Issue 19038 was caused by the following sequence of events:
     //
@@ -568,15 +696,17 @@ main() {
       "app|foo.txt": "one",
       "app|one.in": "1",
       "app|two.in": "2"
-    }, {"app": [
-      // We need to use CheckContentTransformer here so that
-      // ManyToOneTransformer reads its primary input from memory rather than
-      // from the filesystem. If it read from the filesystem, it might
-      // accidentally get the correct output despite accessing the incorrect
-      // asset, which would cause false positives for the test.
-      [new CheckContentTransformer(new RegExp("one|two"), ".in")],
-      [new ManyToOneTransformer("txt")]
-    ]});
+    }, {
+      "app": [
+        // We need to use CheckContentTransformer here so that
+        // ManyToOneTransformer reads its primary input from memory rather than
+        // from the filesystem. If it read from the filesystem, it might
+        // accidentally get the correct output despite accessing the incorrect
+        // asset, which would cause false positives for the test.
+        [new CheckContentTransformer(new RegExp("one|two"), ".in")],
+        [new ManyToOneTransformer("txt")]
+      ]
+    });
 
     updateSources(["app|foo.txt", "app|one.in", "app|two.in"]);
     expectAsset("app|foo.out", "1");

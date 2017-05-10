@@ -25,8 +25,8 @@ class HasInputTransformer extends MockTransformer {
     return Future.wait(inputs.map((input) {
       return transform.hasInput(input).then((hasInput) => "$input: $hasInput");
     })).then((results) {
-      transform.addOutput(new Asset.fromString(
-          transform.primaryInput.id, results.join(', ')));
+      transform.addOutput(
+          new Asset.fromString(transform.primaryInput.id, results.join(', ')));
     });
   }
 

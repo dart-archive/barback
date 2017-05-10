@@ -15,8 +15,7 @@ import 'aggregate_many_to_many.dart';
 class DeclaringAggregateManyToManyTransformer
     extends AggregateManyToManyTransformer
     implements DeclaringAggregateTransformer {
-  DeclaringAggregateManyToManyTransformer(String extension)
-      : super(extension);
+  DeclaringAggregateManyToManyTransformer(String extension) : super(extension);
 
   Future declareOutputs(DeclaringAggregateTransform transform) =>
       transform.primaryIds.asyncMap(transform.declareOutput).toList();

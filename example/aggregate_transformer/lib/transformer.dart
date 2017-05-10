@@ -16,7 +16,6 @@ class MakeBook extends AggregateTransformer {
   // to handle. Return a value for the assets you want to handle,
   // or null for those that you do not want to handle.
   classifyPrimary(AssetId id) {
-
     // Only process assets where the filename ends with "recipe.html".
     if (!id.path.endsWith('recipe.html')) return null;
 

@@ -18,8 +18,11 @@ class CheckContentAndRenameTransformer extends MockTransformer {
   final String newExtension;
   final String newContent;
 
-  CheckContentAndRenameTransformer({this.oldExtension, this.oldContent,
-      this.newExtension, this.newContent}) {
+  CheckContentAndRenameTransformer(
+      {this.oldExtension,
+      this.oldContent,
+      this.newExtension,
+      this.newContent}) {
     assert(oldExtension != null);
     assert(oldContent != null);
     assert(newExtension != null);

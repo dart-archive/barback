@@ -12,8 +12,7 @@ import 'many_to_one.dart';
 /// the conglomeration until it's materialized.
 class LazyManyToOneTransformer extends ManyToOneTransformer
     implements LazyTransformer {
-  LazyManyToOneTransformer(String extension)
-      : super(extension);
+  LazyManyToOneTransformer(String extension) : super(extension);
 
   void declareOutputs(DeclaringTransform transform) {
     transform.declareOutput(transform.primaryId.changeExtension(".out"));
