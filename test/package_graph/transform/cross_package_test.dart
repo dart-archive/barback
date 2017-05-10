@@ -4,7 +4,6 @@
 
 library barback.test.package_graph.transform.pass_through_test;
 
-import 'package:barback/src/utils.dart';
 import 'package:scheduled_test/scheduled_test.dart';
 
 import '../../utils.dart';
@@ -217,6 +216,29 @@ main() {
     modifyAsset("pkg2|a.inc", "b");
     updateSources(["pkg2|a.inc"]);
     expectAsset("pkg1|a.out", "b");
+    buildShouldSucceed();
+  });
+
+  skip_test("cyclic dependencies between package cascades are supported", () {
+    initGraph({
+      "pkg1|a.txt": "pkg1",
+      "pkg2|a.txt": "pkg2"
+    }, {
+      "pkg1": [
+        [new CopyContentTransformer("pkg2|a.txt", "pkg1|b.txt")],
+        [new CopyContentTransformer("pkg2|b.txt", "pkg1|c.txt")],
+      ],
+      "pkg2": [
+        [new CopyContentTransformer("pkg1|a.txt", "pkg2|b.txt")],
+        [new CopyContentTransformer("pkg1|b.txt", "pkg2|c.txt")],
+      ]
+    });
+
+    updateSources(["pkg1|a.txt", "pkg2|a.txt"]);
+    expectAsset("pkg1|b.txt", "pkg2");
+    expectAsset("pkg1|c.txt", "pkg2");
+    expectAsset("pkg2|b.txt", "pkg1");
+    expectAsset("pkg2|c.txt", "pkg1");
     buildShouldSucceed();
   });
 }

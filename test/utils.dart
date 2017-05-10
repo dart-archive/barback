@@ -23,6 +23,7 @@ export 'transformer/catch_asset_not_found.dart';
 export 'transformer/check_content.dart';
 export 'transformer/check_content_and_rename.dart';
 export 'transformer/conditionally_consume_primary.dart';
+export 'transformer/copy_content.dart';
 export 'transformer/create_asset.dart';
 export 'transformer/declare_assets.dart';
 export 'transformer/declaring_aggregate_many_to_many.dart';
@@ -84,12 +85,12 @@ void initConfig() {
 /// [transformers] is a map from package names to the transformers for each
 /// package.
 void initGraph(
-        [assets, Map<String, Iterable<Iterable<Transformer>>> transformers]) =>
+        [assets, Map<String, Iterable<Iterable<dynamic>>> transformers]) =>
     initStaticGraph(assets, transformers: transformers);
 
 void initStaticGraph(assets,
     {Iterable<String> staticPackages,
-    Map<String, Iterable<Iterable<Transformer>>> transformers}) {
+    Map<String, Iterable<Iterable<dynamic>>> transformers}) {
   if (assets == null) assets = [];
   if (staticPackages == null) staticPackages = [];
   if (transformers == null) transformers = {};
