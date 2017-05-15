@@ -64,8 +64,8 @@ class PackageGraph {
   /// [_tryScheduleResult]).
   bool _resultScheduled = false;
 
-  /// The most recent [BuildResult] emitted on [results].
-  BuildResult _lastResult;
+  /// All [BuildResult]s emitted on [results].
+  final _results = <BuildResult>[];
 
   // TODO(nweiz): This can have bogus errors if an error is created and resolved
   // in the space of one build.
@@ -168,9 +168,10 @@ class PackageGraph {
       return new Future.error(error, _lastUnexpectedErrorTrace);
     }
 
-    // If the last build completed with an error, complete the future with it.
-    if (!_lastResult.succeeded) {
-      return new Future.error(BarbackException.aggregate(_lastResult.errors));
+    // If any build completed with an error, complete the future with it.
+    var result = new BuildResult.aggregate(_results);
+    if (!result.succeeded) {
+      return new Future.error(BarbackException.aggregate(result.errors));
     }
 
     // Otherwise, return all of the final output assets.
@@ -261,9 +262,10 @@ class PackageGraph {
       _resultScheduled = false;
       if (_status != NodeStatus.IDLE) return;
 
-      _lastResult = new BuildResult(_accumulatedErrors);
+      var result = new BuildResult(_accumulatedErrors);
       _accumulatedErrors.clear();
-      _resultsController.add(_lastResult);
+      _results.add(result);
+      _resultsController.add(result);
     });
   }
 
