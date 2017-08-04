@@ -130,10 +130,8 @@ Uint8List toUint8List(List<int> input) {
 ///
 /// This returns a map whose keys are the return values of [fn] and whose values
 /// are lists of each element in [iter] for which [fn] returned that key.
-Map<Object/*=T*/, List/*<S>*/ > groupBy/*<S, T>*/(
-    Iterable/*<S>*/ iter,
-    /*=T*/ fn(/*=S*/ element)) {
-  var map = /*<T, List<S>>*/ {};
+Map<Object, List<S>> groupBy<S, T>(Iterable<S> iter, T fn(S element)) {
+  var map = <T, List<S>>{};
   for (var element in iter) {
     var list = map.putIfAbsent(fn(element), () => []);
     list.add(element);
@@ -160,38 +158,32 @@ List flatten(Iterable nested) {
 }
 
 /// Returns the union of all elements in each set in [sets].
-Set/*<T>*/ unionAll/*<T>*/(Iterable<Set/*<T>*/ > sets) =>
+Set<T> unionAll<T>(Iterable<Set<T>> sets) =>
     sets.fold(new Set(), (union, set) => union.union(set));
 
 /// Creates a new map from [map] with new keys and values.
 ///
 /// The return values of [keyFn] are used as the keys and the return values of
 /// [valueFn] are used as the values for the new map.
-Map/*<K2, V2>*/ mapMap/*<K1, V1, K2, V2>*/(
-        Map/*<K1, V1>*/ map,
-        /*=K2*/ keyFn(/*=K1*/ key, /*=V1*/ value),
-        /*=V2*/ valueFn(/*=K1*/ key, /*=V1*/ value)) =>
+Map<K2, V2> mapMap<K1, V1, K2, V2>(Map<K1, V1> map, K2 keyFn(K1 key, V1 value),
+        V2 valueFn(K1 key, V1 value)) =>
     new Map.fromIterable(map.keys,
-        key: (key) => keyFn(key as dynamic/*=K1*/, map[key]),
-        value: (key) => valueFn(key as dynamic/*=K1*/, map[key]));
+        key: (key) => keyFn(key as K1, map[key]),
+        value: (key) => valueFn(key as K1, map[key]));
 
 /// Creates a new map from [map] with the same keys.
 ///
 /// The return values of [fn] are used as the values for the new map.
-Map/*<K, V2>*/ mapMapValues/*<K, V1, V2>*/(
-        Map/*<K, V1>*/ map,
-        /*=V2*/ fn(/*=K*/ key, /*=V1*/ value)) =>
+Map<K, V2> mapMapValues<K, V1, V2>(Map<K, V1> map, V2 fn(K key, V1 value)) =>
     // TODO(nweiz): Don't explicitly type [key] when sdk#25490 is fixed.
-    mapMap(map, (/*=K*/ key, _) => key, fn);
+    mapMap(map, (K key, _) => key, fn);
 
 /// Creates a new map from [map] with the same keys.
 ///
 /// The return values of [fn] are used as the keys for the new map.
-Map/*<K2, V>*/ mapMapKeys/*<K1, V, K2>*/(
-        Map/*<K1, V>*/ map,
-        /*=K2*/ fn(/*=K1*/ key, /*=V*/ value)) =>
+Map<K2, V> mapMapKeys<K1, V, K2>(Map<K1, V> map, K2 fn(K1 key, V value)) =>
     // TODO(nweiz): Don't explicitly type [value] when sdk#25490 is fixed.
-    mapMap(map, fn, (_, /*=V*/ value) => value);
+    mapMap(map, fn, (_, V value) => value);
 
 /// Returns whether [set1] has exactly the same elements as [set2].
 bool setEquals(Set set1, Set set2) =>
@@ -201,7 +193,7 @@ bool setEquals(Set set1, Set set2) =>
 ///
 /// If [broadcast] is true, this will return a broadcast stream; otherwise, it
 /// will return a buffered stream.
-Stream/*<T>*/ mergeStreams/*<T>*/(Iterable<Stream/*<T>*/ > streams,
+Stream<T> mergeStreams<T>(Iterable<Stream<T>> streams,
     {bool broadcast: false}) {
   streams = streams.toList();
   var doneCount = 0;
@@ -210,8 +202,8 @@ Stream/*<T>*/ mergeStreams/*<T>*/(Iterable<Stream/*<T>*/ > streams,
   // async, then the events we receive will also be async, and forwarding them
   // sync won't change that.
   var controller = broadcast
-      ? new StreamController/*<T>*/ .broadcast(sync: true)
-      : new StreamController/*<T>*/(sync: true);
+      ? new StreamController<T>.broadcast(sync: true)
+      : new StreamController<T>(sync: true);
 
   for (var stream in streams) {
     stream.listen(controller.add, onError: controller.addError, onDone: () {
@@ -251,7 +243,7 @@ Future pumpEventQueue([int times = 20]) {
 
 /// Like [new Future], but avoids dartbug.com/11911 by using async/await under
 /// the covers.
-Future/*<T>*/ newFuture/*<T>*/(/*=T*/ callback()) async => await callback();
+Future<T> newFuture<T>(T callback()) async => await callback();
 
 /// Returns a buffered stream that will emit the same values as the stream
 /// returned by [future] once [future] completes.
@@ -262,10 +254,9 @@ Future/*<T>*/ newFuture/*<T>*/(/*=T*/ callback()) async => await callback();
 /// If [broadcast] is true, a broadcast stream is returned. This assumes that
 /// the stream returned by [future] will be a broadcast stream as well.
 /// [broadcast] defaults to false.
-Stream/*<T>*/ futureStream/*<T>*/(Future<Stream/*<T>*/ > future,
-    {bool broadcast: false}) {
-  StreamSubscription/*<T>*/ subscription;
-  StreamController/*<T>*/ controller;
+Stream<T> futureStream<T>(Future<Stream<T>> future, {bool broadcast: false}) {
+  StreamSubscription<T> subscription;
+  StreamController<T> controller;
 
   future = DelegatingFuture.typed(future.catchError((e, stackTrace) {
     // Since [controller] is synchronous, it's likely that emitting an error
@@ -290,10 +281,10 @@ Stream/*<T>*/ futureStream/*<T>*/(Future<Stream/*<T>*/ > future,
   }
 
   if (broadcast) {
-    controller = new StreamController/*<T>*/ .broadcast(
+    controller = new StreamController<T>.broadcast(
         sync: true, onListen: onListen, onCancel: onCancel);
   } else {
-    controller = new StreamController/*<T>*/(
+    controller = new StreamController<T>(
         sync: true, onListen: onListen, onCancel: onCancel);
   }
   return controller.stream;
@@ -303,10 +294,10 @@ Stream/*<T>*/ futureStream/*<T>*/(Future<Stream/*<T>*/ > future,
 /// [callback].
 ///
 /// [callback] will only be called when the returned [Stream] gets a subscriber.
-Stream/*<T>*/ callbackStream/*<T>*/(Stream/*<T>*/ callback()) {
-  StreamSubscription/*<T>*/ subscription;
-  StreamController/*<T>*/ controller;
-  controller = new StreamController/*<T>*/(
+Stream<T> callbackStream<T>(Stream<T> callback()) {
+  StreamSubscription<T> subscription;
+  StreamController<T> controller;
+  controller = new StreamController<T>(
       onListen: () {
         subscription = callback().listen(controller.add,
             onError: controller.addError, onDone: controller.close);
@@ -322,14 +313,14 @@ Stream/*<T>*/ callbackStream/*<T>*/(Stream/*<T>*/ callback()) {
 ///
 /// The returned stream will enqueue events from [broadcast] until a listener is
 /// attached, then pipe events to that listener.
-Stream/*<T>*/ broadcastToSingleSubscription/*<T>*/(Stream/*<T>*/ broadcast) {
+Stream<T> broadcastToSingleSubscription<T>(Stream<T> broadcast) {
   if (!broadcast.isBroadcast) return broadcast;
 
   // TODO(nweiz): Implement this using a transformer when issues 18588 and 18586
   // are fixed.
   var subscription;
   var controller =
-      new StreamController/*<T>*/(onCancel: () => subscription.cancel());
+      new StreamController<T>(onCancel: () => subscription.cancel());
   subscription = broadcast.listen(controller.add,
       onError: controller.addError, onDone: controller.close);
   return controller.stream;

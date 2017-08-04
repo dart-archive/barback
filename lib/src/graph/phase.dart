@@ -259,7 +259,7 @@ class Phase {
       }
     }
 
-    var newGroups = DelegatingSet.typed/*<TransformerGroup>*/(
+    var newGroups = DelegatingSet.typed<TransformerGroup>(
         transformers.where((op) => op is TransformerGroup).toSet());
     var oldGroups = _groups.keys.toSet();
     for (var removed in oldGroups.difference(newGroups)) {

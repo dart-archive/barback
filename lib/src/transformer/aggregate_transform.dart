@@ -81,7 +81,7 @@ class AggregateTransform extends BaseTransform {
   /// If an input with [id] cannot be found, throws an [AssetNotFoundException].
   Future<String> readInputAsString(AssetId id, {Encoding encoding}) {
     if (encoding == null) encoding = UTF8;
-    return getInput(id).then/*<Future<String>>*/(
+    return getInput(id).then<Future<String>>(
         (input) => input.readAsString(encoding: encoding));
   }
 
