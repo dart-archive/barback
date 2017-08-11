@@ -17,7 +17,7 @@ test/*: Skip
 [ $runtime == vm && $mode == debug]
 build/test/package_graph/repetition_test: Skip  # Times out
 
-[ $runtime == vm && ( $arch == simarm || $arch == simmips ) ]
+[ $runtime == vm && $arch == simarm ]
 build/test/too_many_open_files_test: Skip # 14220
 
 [ $browser ]
