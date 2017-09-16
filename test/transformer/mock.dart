@@ -7,7 +7,6 @@ library barback.test.transformer.mock;
 import 'dart:async';
 
 import 'package:barback/barback.dart';
-import 'package:barback/src/utils.dart';
 import 'package:scheduled_test/scheduled_test.dart';
 
 /// The abstract base class for transformers used to test barback.
@@ -161,7 +160,7 @@ abstract class MockTransformer extends Transformer {
   ///
   /// This is intended for use by subclasses of [MockTransformer].
   Future<Asset> getPrimary(Transform transform) {
-    return newFuture(() {
+    return new Future.microtask(() {
       if (_primaryInput != null) return _primaryInput.future;
     }).then((_) => transform.primaryInput);
   }
@@ -177,7 +176,7 @@ abstract class MockTransformer extends Transformer {
     if (_runningTransforms == 0) _started.complete();
     _runningTransforms++;
     if (consumePrimary) transform.consumePrimary();
-    return newFuture(() => doApply(transform)).then((_) {
+    return new Future.microtask(() => doApply(transform)).then((_) {
       if (_apply != null) return _apply.future;
     }).whenComplete(() {
       _runningTransforms--;

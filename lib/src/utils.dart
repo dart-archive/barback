@@ -241,10 +241,6 @@ Future pumpEventQueue([int times = 20]) {
   return new Future.delayed(Duration.ZERO, () => pumpEventQueue(times - 1));
 }
 
-/// Like [new Future], but avoids dartbug.com/11911 by using async/await under
-/// the covers.
-Future<T> newFuture<T>(T callback()) async => await callback();
-
 /// Returns a buffered stream that will emit the same values as the stream
 /// returned by [future] once [future] completes.
 ///

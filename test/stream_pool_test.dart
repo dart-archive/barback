@@ -29,7 +29,7 @@ main() {
 
       // Call [toList] asynchronously to be sure that the events have been
       // buffered beforehand and aren't just being received unbuffered.
-      expect(newFuture(() => pool.stream.toList()),
+      expect(new Future.microtask(() => pool.stream.toList()),
           completion(equals(["first", "second"])));
 
       pumpEventQueue().then((_) => pool.close());
@@ -49,7 +49,7 @@ main() {
       controller2.addError("fourth");
       controller1.add("fifth");
 
-      expect(newFuture(() {
+      expect(new Future.microtask(() {
         return pool.stream
             .transform(new StreamTransformer.fromHandlers(
                 handleData: (data, sink) => sink.add(["data", data]),
@@ -78,7 +78,7 @@ main() {
 
       // Call [toList] asynchronously to be sure that the events have been
       // buffered beforehand and aren't just being received unbuffered.
-      expect(newFuture(() => pool.stream.toList()),
+      expect(new Future.microtask(() => pool.stream.toList()),
           completion(equals(["first", "second"])));
 
       pumpEventQueue().then((_) => pool.close());
@@ -99,7 +99,8 @@ main() {
 
       // Call [toList] asynchronously to be sure that the events have been
       // buffered beforehand and aren't just being received unbuffered.
-      expect(newFuture(() => pool.stream.toList()), completion(isEmpty));
+      expect(new Future.microtask(() => pool.stream.toList()),
+          completion(isEmpty));
 
       pumpEventQueue().then((_) => pool.close());
     });
@@ -115,7 +116,7 @@ main() {
       pool.add(controller2.stream);
       controller2.addError("second");
 
-      expect(newFuture(() {
+      expect(new Future.microtask(() {
         return pool.stream
             .transform(new StreamTransformer.fromHandlers(
                 handleData: (data, sink) => sink.add(data),

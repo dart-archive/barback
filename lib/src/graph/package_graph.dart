@@ -257,7 +257,7 @@ class PackageGraph {
     if (_resultScheduled) return;
 
     _resultScheduled = true;
-    newFuture(() {
+    new Future.microtask(() {
       _resultScheduled = false;
       if (_status != NodeStatus.IDLE) return;
 
