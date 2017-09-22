@@ -1,3 +1,7 @@
+## 0.15.2+12
+
+* Declare support for `async` 2.0.0.
+
 ## 0.15.2+11
 
 * Update `AssetNode.whenAvailable` to be a generic method to fix a new strong
