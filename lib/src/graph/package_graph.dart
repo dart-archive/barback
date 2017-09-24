@@ -39,8 +39,7 @@ class PackageGraph {
   /// If an unexpected error in barback itself occurs, it will be emitted
   /// through this stream's error channel.
   Stream<BuildResult> get results => _resultsController.stream;
-  final _resultsController =
-      new StreamController<BuildResult>.broadcast(sync: true);
+  final _resultsController = new StreamController<BuildResult>.broadcast();
 
   /// A stream that emits any errors from the graph or the transformers.
   ///
