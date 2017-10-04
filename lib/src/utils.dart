@@ -241,6 +241,14 @@ Future pumpEventQueue([int times = 20]) {
   return new Future.delayed(Duration.ZERO, () => pumpEventQueue(times - 1));
 }
 
+/// Names [new Future.microtask] so that it is used consistently throughout this
+/// package.
+///
+/// Barback relies on ordering guarantees that aren't enforced by chaining
+/// futures explicitly so all Future creations must be microtasks instead of
+/// hitting the event loop to match [new Future.value]
+Future<T> newFuture<T>(T callback()) => new Future.microtask(callback);
+
 /// Returns a buffered stream that will emit the same values as the stream
 /// returned by [future] once [future] completes.
 ///

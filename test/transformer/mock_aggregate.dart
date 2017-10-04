@@ -163,7 +163,7 @@ abstract class MockAggregateTransformer extends AggregateTransformer {
   ///
   /// This is intended for use by subclasses of [MockAggregateTransformer].
   Stream<Asset> getPrimaryInputs(AggregateTransform transform) {
-    return futureStream(new Future.microtask(() {
+    return futureStream(newFuture(() {
       if (_primaryInputs != null) return _primaryInputs.future;
     }).then((_) => transform.primaryInputs));
   }
@@ -178,7 +178,7 @@ abstract class MockAggregateTransformer extends AggregateTransformer {
     _numRuns++;
     if (_runningTransforms == 0) _started.complete();
     _runningTransforms++;
-    return new Future.microtask(() => doApply(transform)).then((_) {
+    return newFuture(() => doApply(transform)).then((_) {
       if (_apply != null) return _apply.future;
     }).whenComplete(() {
       for (var id in consumePrimaries) {
