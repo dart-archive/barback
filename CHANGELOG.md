@@ -1,3 +1,8 @@
+## 0.15.2+12
+
+* Enforce ordering of Futures with `Future.microtask` rather than async and
+  await to account for upcoming behavior changes with async methods.
+
 ## 0.15.2+11
 
 * Update `AssetNode.whenAvailable` to be a generic method to fix a new strong
