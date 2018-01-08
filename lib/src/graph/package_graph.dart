@@ -127,7 +127,7 @@ class PackageGraph {
   ///
   /// If the asset cannot be found, returns null.
   Future<AssetNode> getAssetNode(AssetId id) {
-    return _inErrorZone<Future<AssetNode>>(() {
+    return _inErrorZone(() {
       var cascade = _cascades[id.package];
       if (cascade != null) return cascade.getAssetNode(id);
       return new Future.value(null);
@@ -158,7 +158,7 @@ class PackageGraph {
 
     if (_status != NodeStatus.IDLE) {
       // A build is still ongoing, so wait for it to complete and try again.
-      return results.first.then<Future<AssetSet>>((_) => getAllAssets());
+      return results.first.then((_) => getAllAssets());
     }
 
     // If an unexpected error occurred, complete with that.
@@ -274,7 +274,7 @@ class PackageGraph {
   /// [Future]. If it throws a [BarbackException], that exception will be piped
   /// to the returned [Future] as well. Any other exceptions will be piped to
   /// [results].
-  Future<T> _inErrorZone<T>(T body()) {
+  Future<T> _inErrorZone<T>(FutureOr<T> body()) {
     var completer = new Completer<T>.sync();
     runZoned(() {
       new Future.sync(body)
