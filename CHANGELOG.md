@@ -1,3 +1,7 @@
+## 0.15.2+15
+
+* Officially deprecated this package. Not supported in Dart 2.
+
 ## 0.15.2+14
 
 * Update code to eliminate Future flattening in Dart 2.0.
