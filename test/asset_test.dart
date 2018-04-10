@@ -37,7 +37,7 @@ main() {
     new File(textFilePath).writeAsStringSync("çøñ†éℵ™");
 
     latin1FilePath = pathos.join(tempDir.path, "file.latin1");
-    new File(latin1FilePath).writeAsBytesSync(LATIN1.encode("blåbærgrød"));
+    new File(latin1FilePath).writeAsBytesSync(latin1.encode("blåbærgrød"));
   });
 
   tearDown(() {
@@ -86,7 +86,7 @@ main() {
     test("gets the UTF-8-encoded string for a string asset", () {
       var asset = new Asset.fromString(id, "çøñ†éℵ™");
       expect(
-          asset.read().toList(), completion(equals([UTF8.encode("çøñ†éℵ™")])));
+          asset.read().toList(), completion(equals([utf8.encode("çøñ†éℵ™")])));
     });
 
     test("gets the raw bytes for a byte asset", () {
@@ -102,26 +102,26 @@ main() {
     test("gets the raw bytes for a text file", () {
       var asset = new Asset.fromPath(id, textFilePath);
       expect(
-          asset.read().toList(), completion(equals([UTF8.encode("çøñ†éℵ™")])));
+          asset.read().toList(), completion(equals([utf8.encode("çøñ†éℵ™")])));
     });
 
     test("gets the raw bytes for a stream", () {
       var asset = new Asset.fromStream(
-          id, new Stream.fromFuture(new Future.value(UTF8.encode("çøñ†éℵ™"))));
+          id, new Stream.fromFuture(new Future.value(utf8.encode("çøñ†éℵ™"))));
       expect(
-          asset.read().toList(), completion(equals([UTF8.encode("çøñ†éℵ™")])));
+          asset.read().toList(), completion(equals([utf8.encode("çøñ†éℵ™")])));
     });
   });
 
   group("readAsString()", () {
     group("byte asset", () {
       test("defaults to UTF-8 if encoding is omitted", () {
-        var asset = new Asset.fromBytes(id, UTF8.encode("çøñ†éℵ™"));
+        var asset = new Asset.fromBytes(id, utf8.encode("çøñ†éℵ™"));
         expect(asset.readAsString(), completion(equals("çøñ†éℵ™")));
       });
 
       test("supports UTF-8", () {
-        var asset = new Asset.fromBytes(id, UTF8.encode("çøñ†éℵ™"));
+        var asset = new Asset.fromBytes(id, utf8.encode("çøñ†éℵ™"));
         expect(
             asset.readAsString(encoding: UTF8), completion(equals("çøñ†éℵ™")));
       });
@@ -152,19 +152,19 @@ main() {
     group("stream asset", () {
       test("defaults to UTF-8 if encoding is omitted", () {
         var asset = new Asset.fromStream(id,
-            new Stream.fromFuture(new Future.value(UTF8.encode("çøñ†éℵ™"))));
+            new Stream.fromFuture(new Future.value(utf8.encode("çøñ†éℵ™"))));
         expect(asset.readAsString(), completion(equals("çøñ†éℵ™")));
       });
 
       test("supports UTF-8", () {
         var asset = new Asset.fromStream(id,
-            new Stream.fromFuture(new Future.value(UTF8.encode("çøñ†éℵ™"))));
+            new Stream.fromFuture(new Future.value(utf8.encode("çøñ†éℵ™"))));
         expect(
             asset.readAsString(encoding: UTF8), completion(equals("çøñ†éℵ™")));
       });
 
       test("supports ISO-8859-1", () {
-        var future = new Future.value(LATIN1.encode("blåbærgrød"));
+        var future = new Future.value(latin1.encode("blåbærgrød"));
         var asset = new Asset.fromStream(id, new Stream.fromFuture(future));
         expect(asset.readAsString(encoding: LATIN1),
             completion(equals("blåbærgrød")));
@@ -223,7 +223,7 @@ main() {
     test("gets the UTF-8-encoded string for a string asset", () {
       var asset = new Asset.fromString(id, "çøñ†éℵ™");
       expect(getBytesFromIsolate(asset),
-          completion(equals(UTF8.encode("çøñ†éℵ™"))));
+          completion(equals(utf8.encode("çøñ†éℵ™"))));
     });
 
     test("gets the raw bytes for a byte asset", () {
@@ -239,14 +239,14 @@ main() {
     test("gets the raw bytes for a text file", () {
       var asset = new Asset.fromPath(id, textFilePath);
       expect(getBytesFromIsolate(asset),
-          completion(equals(UTF8.encode("çøñ†éℵ™"))));
+          completion(equals(utf8.encode("çøñ†éℵ™"))));
     });
 
     test("gets the raw bytes for a stream", () {
       var asset = new Asset.fromStream(
-          id, new Stream.fromFuture(new Future.value(UTF8.encode("çøñ†éℵ™"))));
+          id, new Stream.fromFuture(new Future.value(utf8.encode("çøñ†éℵ™"))));
       expect(getBytesFromIsolate(asset),
-          completion(equals(UTF8.encode("çøñ†éℵ™"))));
+          completion(equals(utf8.encode("çøñ†éℵ™"))));
     });
   });
 }

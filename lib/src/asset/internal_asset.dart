@@ -136,7 +136,7 @@ class StringAsset implements Asset {
       new Future.value(_contents);
 
   Stream<List<int>> read() =>
-      new Future<List<int>>.value(UTF8.encode(_contents)).asStream();
+      new Future<List<int>>.value(utf8.encode(_contents)).asStream();
 
   String toString() {
     // Don't show the whole string if it's long.
