@@ -67,7 +67,7 @@ class BinaryAsset implements Asset {
   BinaryAsset(this.id, List<int> contents) : _contents = toUint8List(contents);
 
   Future<String> readAsString({Encoding encoding}) {
-    if (encoding == null) encoding = UTF8;
+    if (encoding == null) encoding = utf8;
 
     return new Future.value(encoding.decode(_contents));
   }
@@ -115,7 +115,7 @@ class FileAsset implements Asset {
   FileAsset(this.id, this._path);
 
   Future<String> readAsString({Encoding encoding}) {
-    if (encoding == null) encoding = UTF8;
+    if (encoding == null) encoding = utf8;
     return _pool.readAsString(_path, encoding);
   }
 
@@ -172,7 +172,7 @@ class StreamAsset implements Asset {
       : _replayer = new StreamReplayer(stream);
 
   Future<String> readAsString({Encoding encoding}) {
-    if (encoding == null) encoding = UTF8;
+    if (encoding == null) encoding = utf8;
     return _replayer
         .getReplay()
         .expand((chunk) => chunk)

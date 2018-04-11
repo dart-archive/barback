@@ -123,7 +123,7 @@ main() {
       test("supports UTF-8", () {
         var asset = new Asset.fromBytes(id, utf8.encode("çøñ†éℵ™"));
         expect(
-            asset.readAsString(encoding: UTF8), completion(equals("çøñ†éℵ™")));
+            asset.readAsString(encoding: utf8), completion(equals("çøñ†éℵ™")));
       });
 
       // TODO(rnystrom): Test other encodings once #6284 is fixed.
@@ -137,7 +137,7 @@ main() {
 
       test("ignores the encoding", () {
         var asset = new Asset.fromString(id, "contents");
-        expect(asset.readAsString(encoding: LATIN1),
+        expect(asset.readAsString(encoding: latin1),
             completion(equals("contents")));
       });
     });
@@ -160,13 +160,13 @@ main() {
         var asset = new Asset.fromStream(id,
             new Stream.fromFuture(new Future.value(utf8.encode("çøñ†éℵ™"))));
         expect(
-            asset.readAsString(encoding: UTF8), completion(equals("çøñ†éℵ™")));
+            asset.readAsString(encoding: utf8), completion(equals("çøñ†éℵ™")));
       });
 
       test("supports ISO-8859-1", () {
         var future = new Future.value(latin1.encode("blåbærgrød"));
         var asset = new Asset.fromStream(id, new Stream.fromFuture(future));
-        expect(asset.readAsString(encoding: LATIN1),
+        expect(asset.readAsString(encoding: latin1),
             completion(equals("blåbærgrød")));
       });
     });
